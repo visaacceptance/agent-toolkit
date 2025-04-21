@@ -1,4 +1,4 @@
-# CyberSource Agent Toolkit
+# Visa Acceptance Agent Toolkit
 
 ## Quick Example: Creating a Payment Link
 
@@ -24,7 +24,7 @@ async function createPaymentLink() {
 }
 ```
 
-The CyberSource Agent Toolkit is a library designed to help AI assistants interact with the CyberSource API through the Model Context Protocol (MCP). It provides tools that make it easy to perform payment operations with CyberSource, currently focused on refund processing.
+The Visa Acceptance Agent Toolkit is a library designed to help AI assistants interact with the Visa Acceptance API through the Model Context Protocol (MCP). It provides tools that make it easy to perform payment operations with Visa Acceptance, currently focused on refund processing.
 
 ## Features
 
@@ -37,7 +37,7 @@ The CyberSource Agent Toolkit is a library designed to help AI assistants intera
 
 ### TypeScript
 
-The TypeScript implementation provides an MCP server that can be used with any MCP-compatible client to process refunds through the CyberSource API.
+The TypeScript implementation provides an MCP server that can be used with any MCP-compatible client to process refunds through the Visa Acceptance API.
 
 Key features:
 - Full MCP server implementation
@@ -50,12 +50,12 @@ Key features:
 
 ## Authentication
 
-The CyberSource Agent Toolkit uses CyberSource API credentials which include:
+The Visa Acceptance Agent Toolkit uses Visa Acceptance API credentials which include:
 - Merchant ID
 - API Key ID 
 - Secret Key
 
-These can be obtained from your CyberSource account dashboard.
+These can be obtained from your Visa Acceptance account dashboard.
 
 ## Getting Started
 
@@ -63,7 +63,7 @@ These can be obtained from your CyberSource account dashboard.
 
 - Node.js 16.x or higher
 - npm or yarn package manager
-- CyberSource API credentials
+- Visa Acceptance API credentials
 
 ### Installation
 
@@ -83,7 +83,7 @@ Create a `.env` file based on the provided template:
 cp .env.template .env
 ```
 
-Edit the `.env` file with your CyberSource API credentials.
+Edit the `.env` file with your Visa Acceptance API credentials.
 
 ### Running the MCP Server
 
@@ -113,7 +113,7 @@ Here is a quick guide to set up and run this MCP server:
    ```bash
    npm install
    ```
-2. Configure your environment variables (e.g., CYBERSOURCE_MERCHANT_ID, CYBERSOURCE_API_KEY_ID, CYBERSOURCE_SECRET_KEY).
+2. Configure your environment variables (e.g., VISA_ACCEPTANCE_MERCHANT_ID, VISA_ACCEPTANCE_API_KEY_ID, VISA_ACCEPTANCE_SECRET_KEY).
 3. To start the MCP server, run:
    ```bash
    npm start
@@ -123,7 +123,7 @@ Here is a quick guide to set up and run this MCP server:
 
 ## Supported Tools
 
-The CyberSource Agent Toolkit currently supports these MCP Tools:
+The Visa Acceptance Agent Toolkit currently supports these MCP Tools:
 
 1. process_refund  
    Processes a refund for a transaction.
@@ -134,11 +134,11 @@ The CyberSource Agent Toolkit currently supports these MCP Tools:
 4. create_payment_link  
    Creates a pay-by-link for a specified purchase.
 5. create_invoice  
-   Creates an invoice using the CyberSource Node.js SDK for invoice creation.
+   Creates an invoice using the Visa Acceptance Node.js SDK for invoice creation.
 
 ## MCP Toolkit Support
 
-This library supports the Model Context Protocol (MCP), enabling easy integration with CyberSource for creating and managing payment links, processing refunds, and more. For more usage details, see the TypeScript examples and readme.
+This library supports the Model Context Protocol (MCP), enabling easy integration with Visa Acceptance for creating and managing payment links, processing refunds, and more. For more usage details, see the TypeScript examples and readme.
 
 ## License
 
