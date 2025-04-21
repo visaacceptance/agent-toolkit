@@ -1,7 +1,7 @@
 {
-  "name": "@cybersource/agent-toolkit-mcp",
+  "name": "@visa-acceptance/agent-toolkit-mcp",
   "version": "0.1.0",
-  "description": "CyberSource Agent Toolkit with MCP integration for refund functionality",
+  "description": "Visa Acceptance Agent Toolkit with MCP integration for refund functionality",
   "type": "commonjs",
   "main": "index.js",
   "bin": {
@@ -35,14 +35,14 @@
     "node": ">=16.0.0"
   },
   "keywords": [
-    "cybersource",
+    "visa-acceptance",
     "agent",
     "toolkit",
     "mcp",
     "model-context-protocol",
     "refund"
   ],
-  "author": "Your Organization",
+  "author": "Visa Acceptance",
   "license": "MIT",
   "files": [
     "index.js",
