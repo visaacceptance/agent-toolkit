@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Note: This page should be hosted on an allowed domain (by default on localhost) -->
+    <title>CyberSource Unified Checkout Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #1a1f71; /* Visa blue */
+        }
+        .container {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .button {
+            background-color: #1a1f71;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        .button:hover {
+            background-color: #142057;
+        }
+        .info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-left: 4px solid #1a1f71;
+            margin: 20px 0;
+        }
+        #status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .code-block {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 20px 0;
+        }
+    </style>
+    <!-- Use exact SDK version that matches the one in the capture context JWT -->
+    <script src="https://apitest.cybersource.com/uc/v1/assets/0.23.1/SecureAcceptance.js" crossorigin="anonymous"></script>
+    
+    <!-- Add error event listeners for iframes -->
+    <script>
+    window.addEventListener('error', function(e) {
+        console.error('Global error event:', e.message, e);
+        document.getElementById('status').className = 'error';
+        document.getElementById('status').textContent = 'Global error: ' + e.message;
+    });
+    </script>
+</head>
+<body>
+    <h1>CyberSource Unified Checkout Demo</h1>
+    
+    <div class="info">
+        <p>This demo shows how to use CyberSource's Unified Checkout with a capture context for Visa cards in USD currency.</p>
+        <p>The capture context was generated using the CyberSource MCP server.</p>
+        <p><strong>Note:</strong> Due to Content Security Policy (CSP) restrictions, the actual payment form will only display correctly when hosted on an approved domain (as specified in the capture context). When running locally, you'll still see the initialization code and JavaScript example.</p>
+    </div>
+    
+    <div class="container">
+            <h2>Step 1: Capture Context</h2>
+            <p>The capture context is a JWT that contains configuration information for the payment form:</p>
+            <pre id="capture-context-jwt"></pre>
+            
+            <h2>Step 2: Extract Dynamic Values</h2>
+            <div id="extracted-values"></div>
+            
+            <h2>Step 3: Initialize Unified Checkout</h2>
+            <p>Click the button below to initialize and display Unified Checkout:</p>
+            <button id="initialize-button" class="button">Initialize & Display Unified Checkout</button>
+            
+            <div id="status"></div>
+            <!-- Restructure to match a known working example more closely -->
+            <div id="payment-container">
+                <form id="authForm" action="/process-payment" method="post">
+                    <input type="hidden" id="captureContext" name="captureContext" value="">
+                    <input type="hidden" id="transientToken" name="transientToken" value="">
+                </form>
+                
+                <!-- Move the container outside of form to avoid interaction issues -->
+                <div id="buttonPaymentListContainer" style="min-height: 300px; margin-top: 15px; border: 1px solid #eee; padding: 10px; border-radius: 4px;"></div>
+            </div>
+        </div>
+    
+    <div class="container">
+        <h2>Implementation Details</h2>
+        <p>This demo follows the exact pattern specified in the documentation:</p>
+        
+        <div class="code-block">
+            <p><strong>1. Extract dynamic values from the capture context:</strong></p>
+            <pre>const payload = parseJwt(captureContext);
+const clientLibrary = payload.ctx[0].data.clientLibrary;
+const clientLibraryIntegrity = payload.ctx[0].data.clientLibraryIntegrity;</pre>
+            
+            <p><strong>2. Create script element with dynamic values:</strong></p>
+            <pre>const script = document.createElement('script');
+script.src = clientLibrary;
+script.integrity = clientLibraryIntegrity;
+script.crossOrigin = "anonymous";
+document.head.appendChild(script);</pre>
+            
+            <p><strong>3. Initialize Accept with the capture context:</strong></p>
+            <pre>Accept(captureContext).then(function(accept) {
+    // Use accept object
+});</pre>
+        </div>
+    </div>
+
+    <script>
+        // Configuration options - modify these to change the accepted domains
+        const config = {
+            // By default, add localhost to allowed domains list (both http and https)
+            additionalAllowedDomains: [
+                "http://localhost",
+                "http://localhost:3000",
+                "http://localhost:8000",
+                "http://localhost:8080",
+                "http://localhost:8081", // Added port 8081 used by demo-server.js
+                "https://localhost",
+                "https://localhost:3000",
+                "https://localhost:8000",
+                "https://localhost:8080",
+                "https://localhost:8081",
+                "https://unified-payments.appspot.com" // Add the real appspot domain
+            ],
+            forceAllowCurrentDomain: true // Force allow the current domain
+        };
+        
+        // The capture context will be fetched from the server
+        let captureContext = null;
+        
+        // Function to fetch capture context from the server
+        async function fetchCaptureContext() {
+            try {
+                const response = await fetch('/capture-context');
+                const data = await response.json();
+                
+                if (data.success && data.capture_context) {
+                    captureContext = data.capture_context;
+                    console.log('Successfully fetched capture context');
+                    
+                    // Set the capture context in the hidden input immediately
+                    document.getElementById('captureContext').value = captureContext;
+                    
+                    // Now display capture context info
+                    displayCaptureContext();
+                    
+                    // Enable the initialize button
+                    const initButton = document.getElementById('initialize-button');
+                    initButton.disabled = false;
+                    initButton.textContent = 'Initialize & Display Unified Checkout';
+                } else {
+                    console.error('Failed to fetch capture context:', data.error || 'Unknown error');
+                    document.getElementById('status').textContent = 'Error: Failed to fetch capture context';
+                    document.getElementById('status').className = 'error';
+                    
+                    // Use a hardcoded fallback if available (not ideal but can help for testing)
+                    captureContext = "eyJraWQiOiJ6dSIsImFsZyI6IlJTMjU2In0.eyJmbHgiOnsicGF0aCI6Ii9mbGV4L3YyL3Rva2VucyIsImRhdGEiOiJOOEhZeFVKcGxEWlh5Um14MG42UWt4QUFFQzV2bSsvdGU4UmhGYVpQOThsc1pBMVUxeUNUSTdBeGlTVG5ZMldBb0VWYlFaMHMxUkJyMFd4Mi9KeHI2dWIwd0lOcVVzQXVCOUpZVERIN1BmanFhOG5JbzMzZDdPK0JCNFlGSTB1NnJscTYiLCJvcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsInVzZSI6ImVuYyIsIm4iOiJrbGFNXzdKdXhGZTdfenJfamp4MTBPUUlKdEZINDZGUlZwVHIyYXpJUmZiUlB5TFY5cnhLWV9CVXhSU0puR2VXZW5SYy1WcjhEeXBsMnh6QUJYMTNkaEZ1VHNLa3VzR0paUk5PMFFkZmdRcG1WUDhtRkVJQjFzTjktZUF1RDd1SV90SFBCWlIyeVNwWmVRRWFTWVpyVHk4dnhiOU0xMG1jQ0t6OU13c093Qi1GNVRmcHJPaUN4QTJ2TkhZdjFJSEtrRmpfZWxRYUJFQkY5UEU4ZVhKcmE4UUpUZXFQdmg1SGVnNktDRE9HZUkwVkp4UHMyQVlibjR1MlV4amlwQWtWU085SEhmNUpaZDk5MjFqTXRrX3M1VWoyd3NORUZsZ2NNVGQtbTVvek4yd2NEMWxBRnROak1ycDc5SWk2amtoRkZRUnNQUHhleFhaRnFkSTJ4WjJPQ3ciLCJraWQiOiIwOE84TXREM0FycFFYSzZCd3YzR3RrN0lEMm9uVUcyUSJ9fSwiY3R4IjpbeyJkYXRhIjp7ImFsbG93ZWRQYXltZW50VHlwZXMiOlsiQ0xJQ0tUT1BBWSIsIlBBTkVOVFJZIiwiR09PR0xFUEFZIl0sInBheW1lbnRDb25maWd1cmF0aW9ucyI6eyJTUkNWSVNBIjp7Im9yaWdpbiI6Imh0dHBzOi8vc2FuZGJveC1hc3NldHMuc2VjdXJlLmNoZWNrb3V0LnZpc2EuY29tIiwicGF0aCI6Ii9jaGVja291dC13aWRnZXQvcmVzb3VyY2VzL2pzL3NyYy1pLWFkYXB0ZXIvdmlzYVNkay5qcz92MiIsInBhbkVuY3J5cHRpb25LZXkiOnsia3R5IjoiUlNBIiwiZSI6IkFRQUIiLCJ1c2UiOiJlbmMiLCJraWQiOiJXMFBaOFZYVVZFQlU5NUpPNlpEWTEzc3E1Si1keFRuNTZmSWJEWDZObWMzWmo5V3FjIiwibiI6InNaUEl1c0RmN3lRbm5oQmtVOW11MTRWT08zQ3J1aTNiN3JBZjJLWWVvYlVSbVhBMTdiMUpYOWpnMENkLXZncG11eVRyeEJVU2MtNGIwLVVQZ1N3R0ZxUFdVcHgwOEV4cXJ3UERPdkZvakJvdTJ3bHlxOGJjeTBVcy1CZmVDelNFNWxNVmRTWFRYWFhjTnF1LXFiMjJqQ0NDSkFMcHhzQXJzYm9NT1hzTGVkaDNNNFhOUTVYR0F0UmY3Yi0tdVRZNURyOUtMWXlVdlpLQW5ZMDRNS0pQRU81NFlpSUZNNURUQWhOT21zMDg5amRNZHgtVVJJS0pqUFUyLVJwSEcxdThMQ0cwMjhSVElwUHNOYlJhbnVTNVRBWV96bHhEZ2IxaEtKMzZZYlpFTkhMZzlQWFRCaGRPTWxVOTBEVExsZmNiTFRhLUQ3RGdsakFhV0N1dnpMUGFHdyJ9LCJwYXJhbWV0ZXJzIjp7InNyY0luaXRpYXRvcklkIjoiSkZDWjhRVk9KQTc2TlhaNjhGWkQyMVJZSXhqM3lQWmRpVXhrZE51aWJCbHhnd2FQNCIsInNyY2lEcGFJZCI6ImQzM2NmZjc4LWI2M2EtNGZlNy1iZWJhLTczYmE1YzY1M2ZiZiIsInNyY2lUcmFuc2FjdGlvbklkIjoiNTNkZWU1MzctYzk5NS00Yzk3LWFkYTgtZjYwOWQyMjgyYTM4IiwiZHBhVHJhbnNhY3Rpb25PcHRpb25zIjp7ImRwYUxvY2FsZSI6ImVuX1VTIiwicGF5bG9hZFR5cGVJbmRpY2F0b3IiOiJGVUxMIiwicmV2aWV3QWN0aW9uIjoiY29udGludWUiLCJkcGFBY2NlcHRlZEJpbGxpbmdDb3VudHJpZXMiOltdLCJkcGFBY2NlcHRlZFNoaXBwaW5nQ291bnRyaWVzIjpbXSwiZHBhQmlsbGluZ1ByZWZlcmVuY2UiOiJBTEwiLCJkcGFTaGlwcGluZ1ByZWZlcmVuY2UiOiJBTEwiLCJjb25zdW1lck5hbWVSZXF1ZXN0ZWQiOnRydWUsImNvbnN1bWVyRW1haWxBZGRyZXNzUmVxdWVzdGVkIjp0cnVlLCJjb25zdW1lclBob25lTnVtYmVyUmVxdWVzdGVkIjp0cnVlLCJtZXJjaGFudENvdW50cnlDb2RlIjoiVVMiLCJjdXN0b21JbnB1dERhdGEiOnsiY2hlY2tvdXRPcmNoZXN0cmF0b3IiOiJtZXJjaGFudCJ9LCJ0cmFuc2FjdGlvbkFtb3VudCI6eyJ0cmFuc2FjdGlvbkFtb3VudCI6IjQwMDAiLCJ0cmFuc2FjdGlvbkN1cnJlbmN5Q29kZSI6IlVTRCJ9LCJwYXltZW50T3B0aW9ucyI6eyJkcGFQYW5SZXF1ZXN0ZWQiOnRydWV9fX19LCJHT09HTEVQQVkiOnsiY2xpZW50TGlicmFyeSI6Imh0dHBzOi8vcGF5Lmdvb2dsZS5jb20vZ3AvcC9qcy9wYXkuanMiLCJwYXltZW50T3B0aW9ucyI6eyJlbnZpcm9ubWVudCI6IlRFU1QifSwicGF5bWVudERhdGFSZXF1ZXN0Ijp7ImFwaVZlcnNpb24iOjIsImFwaVZlcnNpb25NaW5vciI6MCwibWVyY2hhbnRJbmZvIjp7Im1lcmNoYW50SWQiOiJCQ1IyRE40VDdERFlCVFRWIiwibWVyY2hhbnROYW1lIjoiVmlzYSBBY2NlcHRhbmNlIFNvbHV0aW9ucyJ9LCJhbGxvd2VkUGF5bWVudE1ldGhvZHMiOlt7InR5cGUiOiJDQVJEIiwicGFyYW1ldGVycyI6eyJhbGxvd2VkQXV0aE1ldGhvZHMiOlsiUEFOX09OTFkiLCJDUllQVE9HUkFNXzNEUyJdLCJhbGxvd2VkQ2FyZE5ldHdvcmtzIjpbIlZJU0EiXSwiYmlsbGluZ0FkZHJlc3NSZXF1aXJlZCI6dHJ1ZSwiYmlsbGluZ0FkZHJlc3NQYXJhbWV0ZXJzIjp7ImZvcm1hdCI6IkZVTEwiLCJwaG9uZU51bWJlclJlcXVpcmVkIjp0cnVlfX0sInRva2VuaXphdGlvblNwZWNpZmljYXRpb24iOnsidHlwZSI6IlBBWU1FTlRfR0FURVdBWSIsInBhcmFtZXRlcnMiOnsiZ2F0ZXdheSI6ImN5YmVyc291cmNlIiwiZ2F0ZXdheU1lcmNoYW50SWQiOiJ2aXNhX2lzdl93b29fcG10MDAxIn19fV0sInRyYW5zYWN0aW9uSW5mbyI6eyJ0b3RhbFByaWNlU3RhdHVzIjoiRklOQUwiLCJ0b3RhbFByaWNlIjoiNDAwMCIsImNvdW50cnlDb2RlIjoiVVMiLCJjdXJyZW5jeUNvZGUiOiJVU0QifSwiZW1haWxSZXF1aXJlZCI6dHJ1ZSwic2hpcHBpbmdBZGRyZXNzUmVxdWlyZWQiOnRydWUsInNoaXBwaW5nQWRkcmVzc1BhcmFtZXRlcnMiOnsicGhvbmVOdW1iZXJSZXF1aXJlZCI6dHJ1ZX19fX0sImNhcHR1cmVNYW5kYXRlIjp7ImJpbGxpbmdUeXBlIjoiRlVMTCIsInJlcXVlc3RFbWFpbCI6dHJ1ZSwicmVxdWVzdFBob25lIjp0cnVlLCJyZXF1ZXN0U2hpcHBpbmciOnRydWUsInNoaXBUb0NvdW50cmllcyI6W10sInNob3dBY2NlcHRlZE5ldHdvcmtJY29ucyI6dHJ1ZX0sIm9yZGVySW5mb3JtYXRpb24iOnsiYW1vdW50RGV0YWlscyI6eyJ0b3RhbEFtb3VudCI6IjQwMDAiLCJjdXJyZW5jeSI6IlVTRCJ9fSwidGFyZ2V0T3JpZ2lucyI6WyJodHRwczovL3VuaWZpZWQtcGF5bWVudHMuYXBwc3BvdC5jb20iXSwiaWZyYW1lcyI6eyJtY2UiOiIvbWNlL21jZS5odG1sIiwiYnV0dG9ucyI6Ii9idXR0b25saXN0L2J1dHRvbmxpc3QuaHRtbCIsInNyYyI6Ii9zZWN1cmUtcmVtb3RlLWNvbW1lcmNlL3NyYy5odG1sIiwiY3RwIjoiL2N0cC9jdHAuaHRtbCIsImdvb2dsZXBheSI6Ii9nb29nbGVwYXkvZ29vZ2xlcGF5Lmh0bWwiLCJhcHBsZXBheSI6Ii9hcHBsZXBheS9hcHBsZXBheS5odG1sIiwicGF6ZSI6Ii9wYXplL3BhemUuaHRtbCIsImNoZWNrIjoiL2NoZWNrL2NoZWNrLmh0bWwifSwiY2xpZW50VmVyc2lvbiI6IjAuMjMiLCJjb3VudHJ5IjoiVVMiLCJsb2NhbGUiOiJlbl9VUyIsImFsbG93ZWRDYXJkTmV0d29ya3MiOlsiVklTQSJdLCJjciI6Ik13WXNtZWRnel9ZT1FVRk9RbnVyd28wSlAwUXdIU0FKS0djV25LRldSazl4NGFyd3hjdUQ4ZVNNNmpOeWVyM2owOGtCNUM3ZHdWY05iU1E3dlVHSXk3MGxsSkkwbFd4WDBUTC16TmxyNkRadHpYR1BvXzZ1QTNiX2Jpb0Rpc0Qtdk9oNGtkZUVWbXNxaHVTbG0xT19qeDhKNTZ3Iiwic2VydmljZU9yaWdpbiI6Imh0dHBzOi8vYXBpdGVzdC5jeWJlcnNvdXJjZS5jb20iLCJjbGllbnRMaWJyYXJ5IjoiaHR0cHM6Ly9hcGl0ZXN0LmN5YmVyc291cmNlLmNvbS91Yy92MS9hc3NldHMvMC4yMy4xL1NlY3VyZUFjY2VwdGFuY2UuanMiLCJsb2dnaW5nUGF0aCI6Ii91Yy92MS9sb2ctZXZlbnRzIiwiYXNzZXRzUGF0aCI6Ii91Yy92MS9hc3NldHMvMC4yMy4xIiwiY2xpZW50TGlicmFyeUludGVncml0eSI6InNoYTI1Ni0wOGFmVFZyYXVKZGkxWC9zdUtFNlJhNUN1eEJaRlIzb3BObFdJNVpqTU0wXHUwMDNkIn0sInR5cGUiOiJnZGEtMC4xMC4wIn1dLCJpc3MiOiJGbGV4IEFQSSIsImV4cCI6MTc0MjM1ODk3NywiaWF0IjoxNzQyMzU4MDc3LCJqdGkiOiJ0R1lXMUVFc3FxMmhLT001In0.NHiqMpcOD5Qa27Y5Ths_qJQ4_DkozkqNxRSTOr0Dfe51UtuxG6V6drnr0rbFrJ63kOlqFLv0ojZh6JOcHXifaIJJ-NPsb2kyruP0qXC4lrlKLkZq4toJvCzfbziuxEaEAC4kXDk7lRuWmMltLMdVijwnqbDVbjraLmf50_oC7AT4s5I1_9woLncdE83KoQXnfCpL0dFrsezKTuntoVSvV7yn1QQ0mFveyC_VQhPe5obWQ0CO4_DUxvEtmV9EfHbsX06px6ZX_ja6iXqaGvDjEhLcee3WlrxKeuWjDxYT-uw9Mb535kYUuPn34N2LsKZkx72D6f5ed9U77bWIHz5LzQ";
+                    
+                    // Set the capture context in the hidden input with fallback
+                    document.getElementById('captureContext').value = captureContext;
+                    
+                    // Display capture context info
+                    displayCaptureContext();
+                    
+                    // Enable the initialize button with a warning
+                    const initButton = document.getElementById('initialize-button');
+                    initButton.disabled = false;
+                    initButton.textContent = 'Initialize with Fallback Capture Context';
+                }
+            } catch (error) {
+                console.error('Error fetching capture context:', error);
+                document.getElementById('status').textContent = 'Error: ' + error.message;
+                document.getElementById('status').className = 'error';
+                
+                // Try to use hardcoded fallback if server fetch fails
+                captureContext = "eyJraWQiOiJ6dSIsImFsZyI6IlJTMjU2In0.eyJmbHgiOnsicGF0aCI6Ii9mbGV4L3YyL3Rva2VucyIsImRhdGEiOiJOOEhZeFVKcGxEWlh5Um14MG42UWt4QUFFQzV2bSsvdGU4UmhGYVpQOThsc1pBMVUxeUNUSTdBeGlTVG5ZMldBb0VWYlFaMHMxUkJyMFd4Mi9KeHI2dWIwd0lOcVVzQXVCOUpZVERIN1BmanFhOG5JbzMzZDdPK0JCNFlGSTB1NnJscTYiLCJvcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsInVzZSI6ImVuYyIsIm4iOiJrbGFNXzdKdXhGZTdfenJfamp4MTBPUUlKdEZINDZGUlZwVHIyYXpJUmZiUlB5TFY5cnhLWV9CVXhSU0puR2VXZW5SYy1WcjhEeXBsMnh6QUJYMTNkaEZ1VHNLa3VzR0paUk5PMFFkZmdRcG1WUDhtRkVJQjFzTjktZUF1RDd1SV90SFBCWlIyeVNwWmVRRWFTWVpyVHk4dnhiOU0xMG1jQ0t6OU13c093Qi1GNVRmcHJPaUN4QTJ2TkhZdjFJSEtrRmpfZWxRYUJFQkY5UEU4ZVhKcmE4UUpUZXFQdmg1SGVnNktDRE9HZUkwVkp4UHMyQVlibjR1MlV4amlwQWtWU085SEhmNUpaZDk5MjFqTXRrX3M1VWoyd3NORUZsZ2NNVGQtbTVvek4yd2NEMWxBRnROak1ycDc5SWk2amtoRkZRUnNQUHhleFhaRnFkSTJ4WjJPQ3ciLCJraWQiOiIwOE84TXREM0FycFFYSzZCd3YzR3RrN0lEMm9uVUcyUSJ9fSwiY3R4IjpbeyJkYXRhIjp7ImFsbG93ZWRQYXltZW50VHlwZXMiOlsiQ0xJQ0tUT1BBWSIsIlBBTkVOVFJZIiwiR09PR0xFUEFZIl0sInBheW1lbnRDb25maWd1cmF0aW9ucyI6eyJTUkNWSVNBIjp7Im9yaWdpbiI6Imh0dHBzOi8vc2FuZGJveC1hc3NldHMuc2VjdXJlLmNoZWNrb3V0LnZpc2EuY29tIiwicGF0aCI6Ii9jaGVja291dC13aWRnZXQvcmVzb3VyY2VzL2pzL3NyYy1pLWFkYXB0ZXIvdmlzYVNkay5qcz92MiIsInBhbkVuY3J5cHRpb25LZXkiOnsia3R5IjoiUlNBIiwiZSI6IkFRQUIiLCJ1c2UiOiJlbmMiLCJraWQiOiJXMFBaOFZYVVZFQlU5NUpPNlpEWTEzc3E1Si1keFRuNTZmSWJEWDZObWMzWmo5V3FjIiwibiI6InNaUEl1c0RmN3lRbm5oQmtVOW11MTRWT08zQ3J1aTNiN3JBZjJLWWVvYlVSbVhBMTdiMUpYOWpnMENkLXZncG11eVRyeEJVU2MtNGIwLVVQZ1N3R0ZxUFdVcHgwOEV4cXJ3UERPdkZvakJvdTJ3bHlxOGJjeTBVcy1CZmVDelNFNWxNVmRTWFRYWFhjTnF1LXFiMjJqQ0NDSkFMcHhzQXJzYm9NT1hzTGVkaDNNNFhOUTVYR0F0UmY3Yi0tdVRZNURyOUtMWXlVdlpLQW5ZMDRNS0pQRU81NFlpSUZNNURUQWhOT21zMDg5amRNZHgtVVJJS0pqUFUyLVJwSEcxdThMQ0cwMjhSVElwUHNOYlJhbnVTNVRBWV96bHhEZ2IxaEtKMzZZYlpFTkhMZzlQWFRCaGRPTWxVOTBEVExsZmNiTFRhLUQ3RGdsakFhV0N1dnpMUGFHdyJ9LCJwYXJhbWV0ZXJzIjp7InNyY0luaXRpYXRvcklkIjoiSkZDWjhRVk9KQTc2TlhaNjhGWkQyMVJZSXhqM3lQWmRpVXhrZE51aWJCbHhnd2FQNCIsInNyY2lEcGFJZCI6ImQzM2NmZjc4LWI2M2EtNGZlNy1iZWJhLTczYmE1YzY1M2ZiZiIsInNyY2lUcmFuc2FjdGlvbklkIjoiNTNkZWU1MzctYzk5NS00Yzk3LWFkYTgtZjYwOWQyMjgyYTM4IiwiZHBhVHJhbnNhY3Rpb25PcHRpb25zIjp7ImRwYUxvY2FsZSI6ImVuX1VTIiwicGF5bG9hZFR5cGVJbmRpY2F0b3IiOiJGVUxMIiwicmV2aWV3QWN0aW9uIjoiY29udGludWUiLCJkcGFBY2NlcHRlZEJpbGxpbmdDb3VudHJpZXMiOltdLCJkcGFBY2NlcHRlZFNoaXBwaW5nQ291bnRyaWVzIjpbXSwiZHBhQmlsbGluZ1ByZWZlcmVuY2UiOiJBTEwiLCJkcGFTaGlwcGluZ1ByZWZlcmVuY2UiOiJBTEwiLCJjb25zdW1lck5hbWVSZXF1ZXN0ZWQiOnRydWUsImNvbnN1bWVyRW1haWxBZGRyZXNzUmVxdWVzdGVkIjp0cnVlLCJjb25zdW1lclBob25lTnVtYmVyUmVxdWVzdGVkIjp0cnVlLCJtZXJjaGFudENvdW50cnlDb2RlIjoiVVMiLCJjdXN0b21JbnB1dERhdGEiOnsiY2hlY2tvdXRPcmNoZXN0cmF0b3IiOiJtZXJjaGFudCJ9LCJ0cmFuc2FjdGlvbkFtb3VudCI6eyJ0cmFuc2FjdGlvbkFtb3VudCI6IjQwMDAiLCJ0cmFuc2FjdGlvbkN1cnJlbmN5Q29kZSI6IlVTRCJ9LCJwYXltZW50T3B0aW9ucyI6eyJkcGFQYW5SZXF1ZXN0ZWQiOnRydWV9fX19LCJHT09HTEVQQVkiOnsiY2xpZW50TGlicmFyeSI6Imh0dHBzOi8vcGF5Lmdvb2dsZS5jb20vZ3AvcC9qcy9wYXkuanMiLCJwYXltZW50T3B0aW9ucyI6eyJlbnZpcm9ubWVudCI6IlRFU1QifSwicGF5bWVudERhdGFSZXF1ZXN0Ijp7ImFwaVZlcnNpb24iOjIsImFwaVZlcnNpb25NaW5vciI6MCwibWVyY2hhbnRJbmZvIjp7Im1lcmNoYW50SWQiOiJCQ1IyRE40VDdERFlCVFRWIiwibWVyY2hhbnROYW1lIjoiVmlzYSBBY2NlcHRhbmNlIFNvbHV0aW9ucyJ9LCJhbGxvd2VkUGF5bWVudE1ldGhvZHMiOlt7InR5cGUiOiJDQVJEIiwicGFyYW1ldGVycyI6eyJhbGxvd2VkQXV0aE1ldGhvZHMiOlsiUEFOX09OTFkiLCJDUllQVE9HUkFNXzNEUyJdLCJhbGxvd2VkQ2FyZE5ldHdvcmtzIjpbIlZJU0EiXSwiYmlsbGluZ0FkZHJlc3NSZXF1aXJlZCI6dHJ1ZSwiYmlsbGluZ0FkZHJlc3NQYXJhbWV0ZXJzIjp7ImZvcm1hdCI6IkZVTEwiLCJwaG9uZU51bWJlclJlcXVpcmVkIjp0cnVlfX0sInRva2VuaXphdGlvblNwZWNpZmljYXRpb24iOnsidHlwZSI6IlBBWU1FTlRfR0FURVdBWSIsInBhcmFtZXRlcnMiOnsiZ2F0ZXdheSI6ImN5YmVyc291cmNlIiwiZ2F0ZXdheU1lcmNoYW50SWQiOiJ2aXNhX2lzdl93b29fcG10MDAxIn19fV0sInRyYW5zYWN0aW9uSW5mbyI6eyJ0b3RhbFByaWNlU3RhdHVzIjoiRklOQUwiLCJ0b3RhbFByaWNlIjoiNDAwMCIsImNvdW50cnlDb2RlIjoiVVMiLCJjdXJyZW5jeUNvZGUiOiJVU0QifSwiZW1haWxSZXF1aXJlZCI6dHJ1ZSwic2hpcHBpbmdBZGRyZXNzUmVxdWlyZWQiOnRydWUsInNoaXBwaW5nQWRkcmVzc1BhcmFtZXRlcnMiOnsicGhvbmVOdW1iZXJSZXF1aXJlZCI6dHJ1ZX19fX0sImNhcHR1cmVNYW5kYXRlIjp7ImJpbGxpbmdUeXBlIjoiRlVMTCIsInJlcXVlc3RFbWFpbCI6dHJ1ZSwicmVxdWVzdFBob25lIjp0cnVlLCJyZXF1ZXN0U2hpcHBpbmciOnRydWUsInNoaXBUb0NvdW50cmllcyI6W10sInNob3dBY2NlcHRlZE5ldHdvcmtJY29ucyI6dHJ1ZX0sIm9yZGVySW5mb3JtYXRpb24iOnsiYW1vdW50RGV0YWlscyI6eyJ0b3RhbEFtb3VudCI6IjQwMDAiLCJjdXJyZW5jeSI6IlVTRCJ9fSwidGFyZ2V0T3JpZ2lucyI6WyJodHRwczovL3VuaWZpZWQtcGF5bWVudHMuYXBwc3BvdC5jb20iXSwiaWZyYW1lcyI6eyJtY2UiOiIvbWNlL21jZS5odG1sIiwiYnV0dG9ucyI6Ii9idXR0b25saXN0L2J1dHRvbmxpc3QuaHRtbCIsInNyYyI6Ii9zZWN1cmUtcmVtb3RlLWNvbW1lcmNlL3NyYy5odG1sIiwiY3RwIjoiL2N0cC9jdHAuaHRtbCIsImdvb2dsZXBheSI6Ii9nb29nbGVwYXkvZ29vZ2xlcGF5Lmh0bWwiLCJhcHBsZXBheSI6Ii9hcHBsZXBheS9hcHBsZXBheS5odG1sIiwicGF6ZSI6Ii9wYXplL3BhemUuaHRtbCIsImNoZWNrIjoiL2NoZWNrL2NoZWNrLmh0bWwifSwiY2xpZW50VmVyc2lvbiI6IjAuMjMiLCJjb3VudHJ5IjoiVVMiLCJsb2NhbGUiOiJlbl9VUyIsImFsbG93ZWRDYXJkTmV0d29ya3MiOlsiVklTQSJdLCJjciI6Ik13WXNtZWRnel9ZT1FVRk9RbnVyd28wSlAwUXdIU0FKS0djV25LRldSazl4NGFyd3hjdUQ4ZVNNNmpOeWVyM2owOGtCNUM3ZHdWY05iU1E3dlVHSXk3MGxsSkkwbFd4WDBUTC16TmxyNkRadHpYR1BvXzZ1QTNiX2Jpb0Rpc0Qtdk9oNGtkZUVWbXNxaHVTbG0xT19qeDhKNTZ3Iiwic2VydmljZU9yaWdpbiI6Imh0dHBzOi8vYXBpdGVzdC5jeWJlcnNvdXJjZS5jb20iLCJjbGllbnRMaWJyYXJ5IjoiaHR0cHM6Ly9hcGl0ZXN0LmN5YmVyc291cmNlLmNvbS91Yy92MS9hc3NldHMvMC4yMy4xL1NlY3VyZUFjY2VwdGFuY2UuanMiLCJsb2dnaW5nUGF0aCI6Ii91Yy92MS9sb2ctZXZlbnRzIiwiYXNzZXRzUGF0aCI6Ii91Yy92MS9hc3NldHMvMC4yMy4xIiwiY2xpZW50TGlicmFyeUludGVncml0eSI6InNoYTI1Ni0wOGFmVFZyYXVKZGkxWC9zdUtFNlJhNUN1eEJaRlIzb3BObFdJNVpqTU0wXHUwMDNkIn0sInR5cGUiOiJnZGEtMC4xMC4wIn1dLCJpc3MiOiJGbGV4IEFQSSIsImV4cCI6MTc0MjM1ODk3NywiaWF0IjoxNzQyMzU4MDc3LCJqdGkiOiJ0R1lXMUVFc3FxMmhLT001In0.NHiqMpcOD5Qa27Y5Ths_qJQ4_DkozkqNxRSTOr0Dfe51UtuxG6V6drnr0rbFrJ63kOlqFLv0ojZh6JOcHXifaIJJ-NPsb2kyruP0qXC4lrlKLkZq4toJvCzfbziuxEaEAC4kXDk7lRuWmMltLMdVijwnqbDVbjraLmf50_oC7AT4s5I1_9woLncdE83KoQXnfCpL0dFrsezKTuntoVSvV7yn1QQ0mFveyC_VQhPe5obWQ0CO4_DUxvEtmV9EfHbsX06px6ZX_ja6iXqaGvDjEhLcee3WlrxKeuWjDxYT-uw9Mb535kYUuPn34N2LsKZkx72D6f5ed9U77bWIHz5LzQ";
+                document.getElementById('captureContext').value = captureContext;
+                
+                // Display capture context info
+                displayCaptureContext();
+                
+                // Enable the initialize button with a warning
+                const initButton = document.getElementById('initialize-button');
+                initButton.disabled = false;
+                initButton.textContent = 'Initialize with Fallback Capture Context';
+            }
+        }
+
+        // Function to parse JWT and extract payload
+        function parseJwt(token) {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+
+            return JSON.parse(jsonPayload);
+        }
+
+        // Function to display capture context and extracted values
+        function displayCaptureContext() {
+            if (!captureContext) {
+                document.getElementById('capture-context-jwt').textContent = 'Loading capture context...';
+                document.getElementById('extracted-values').innerHTML = `
+                    <div class="info">
+                        <p>Waiting for capture context to be loaded from server...</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Display the JWT
+            document.getElementById('capture-context-jwt').textContent = captureContext;
+            
+            try {
+                // Parse the JWT and extract values
+                const payload = parseJwt(captureContext);
+                
+                // Extract values from the JWT
+                const clientLibrary = payload.ctx[0].data.clientLibrary;
+                const clientLibraryIntegrity = payload.ctx[0].data.clientLibraryIntegrity;
+                const allowedCardNetworks = payload.ctx[0].data.allowedCardNetworks;
+                const currency = payload.ctx[0].data.orderInformation?.amountDetails?.currency;
+                const amount = payload.ctx[0].data.orderInformation?.amountDetails?.totalAmount;
+                
+                // Extract additional useful info and merge with configured allowed domains
+                let targetOrigins = payload.ctx[0].data.targetOrigins || [];
+                // Add our configured domains to the allowed list
+                targetOrigins = [...targetOrigins, ...config.additionalAllowedDomains];
+                const currentOrigin = window.location.origin || 'file://';
+                const isAllowedDomain = targetOrigins.includes(currentOrigin);
+                
+                // Separate original and added domains for display
+                const originalTargetOrigins = payload.ctx[0].data.targetOrigins || [];
+                
+                // Display extracted values with domain info
+                const extractedValuesElement = document.getElementById('extracted-values');
+                extractedValuesElement.innerHTML = `
+                    <div class="code-block">
+                        <p><strong>clientLibrary:</strong> ${clientLibrary}</p>
+                        <p><strong>clientLibraryIntegrity:</strong> ${clientLibraryIntegrity}</p>
+                        <p><strong>Allowed Card Networks:</strong> ${allowedCardNetworks.join(', ')}</p>
+                        <p><strong>Currency:</strong> ${currency}</p>
+                        <p><strong>Amount:</strong> ${amount}</p>
+                    </div>
+                    
+                    <div class="info" style="margin-top: 15px;">
+                        <h3>Domain Restrictions</h3>
+                        <p><strong>Original domains from capture context:</strong> ${originalTargetOrigins.length > 0 ? originalTargetOrigins.join(', ') : 'No domains specified'}</p>
+                        <p><strong>Additional allowed domains:</strong> ${config.additionalAllowedDomains.join(', ')}</p>
+                        <p><strong>Current domain:</strong> ${currentOrigin}</p>
+                        <p><strong>Status:</strong> ${isAllowedDomain
+                            ? '<span style="color: green;">✓ Current domain is allowed</span>'
+                            : '<span style="color: red;">✗ Current domain is not in the allowed list</span>'}</p>
+                        <p><em>Note: Due to Content Security Policy restrictions, the payment form will only display correctly when viewed from an allowed domain. Localhost is now pre-configured as allowed.</em></p>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error parsing JWT:', error);
+                document.getElementById('extracted-values').innerHTML = `
+                    <div class="error">Error parsing JWT: ${error.message}</div>
+                `;
+            }
+        }
+
+        // Function to initialize Unified Checkout - Most basic implementation possible
+        function initializeUnifiedCheckout() {
+            // Status element for messages
+            const statusElement = document.getElementById('status');
+            statusElement.textContent = 'Initializing payment...';
+            statusElement.className = '';
+            
+            // Payment container - verify it's clear
+            const container = document.getElementById('buttonPaymentListContainer');
+            container.innerHTML = '';
+            
+            // Log DOM details for debugging
+            console.log("=== DOM SETUP VERIFICATION ===");
+            console.log("Status element:", statusElement);
+            console.log("Container element:", container);
+            console.log("Container visibility:", window.getComputedStyle(container).display);
+            console.log("Form element:", document.getElementById('authForm'));
+            
+            // Use raw string from JWT for capture context
+            const captureContextVal = document.getElementById('captureContext').value;
+            console.log("=== CAPTURE CONTEXT VERIFICATION ===");
+            console.log("Raw JWT length:", captureContextVal.length);
+            console.log("First 30 chars:", captureContextVal.substring(0, 30));
+            console.log("Accept function available:", typeof Accept === 'function');
+            
+            // Super simple showArgs
+            const showArgs = {
+                containers: {
+                    paymentSelection: '#buttonPaymentListContainer'
+                }
+            };
+            console.log("Show args:", showArgs);
+            
+            try {
+                // Add manual debugging to watch iframe creation
+                const originalCreateElement = document.createElement;
+                document.createElement = function(tagName) {
+                    const element = originalCreateElement.call(document, tagName);
+                    if (tagName.toLowerCase() === 'iframe') {
+                        console.log("IFRAME CREATED:", element);
+                        element.addEventListener('load', () => console.log("IFRAME LOADED:", element.src));
+                        element.addEventListener('error', (e) => console.error("IFRAME ERROR:", e));
+                    }
+                    return element;
+                };
+                
+                // Direct implementation with minimal steps
+                console.log("*** STARTING PAYMENT FLOW ***");
+                Accept(captureContextVal)
+                    .then(function(accept) {
+                        console.log("ACCEPT SUCCESS:", accept);
+                        statusElement.textContent = 'Accept initialized';
+                        return accept.unifiedPayments();
+                    })
+                    .then(function(up) {
+                        console.log("UNIFIED PAYMENTS CREATED:", up);
+                        statusElement.textContent = 'Unified Payments created';
+                        console.log("ABOUT TO SHOW PAYMENT UI");
+                        return up.show(showArgs);
+                    })
+                    .then(function(token) {
+                        console.log("PAYMENT UI SUCCESS - TOKEN:", token);
+                        document.getElementById('transientToken').value = token;
+                        statusElement.className = 'success';
+                        statusElement.textContent = 'Payment selection successful!';
+                    })
+                    .catch(function(error) {
+                        console.error("ERROR IN PAYMENT FLOW:", error);
+                        // Extra detailed error logging
+                        if (error.details) console.error("Error details:", error.details);
+                        if (error.name) console.error("Error name:", error.name);
+                        if (error.stack) console.error("Error stack:", error.stack);
+                        
+                        // Check for CSP violations
+                        if (error.message && error.message.includes('Content Security Policy')) {
+                            console.error("CSP VIOLATION DETECTED!");
+                            statusElement.className = 'error';
+                            statusElement.textContent = 'CSP Error: ' + error.message;
+                        } else {
+                            statusElement.className = 'error';
+                            statusElement.textContent = 'Error: ' + (error.message || JSON.stringify(error));
+                        }
+                    });
+                
+                // Restore original createElement
+                setTimeout(() => {
+                    document.createElement = originalCreateElement;
+                }, 5000);
+                
+            } catch (e) {
+                console.error("CRITICAL ERROR:", e);
+                statusElement.className = 'error';
+                statusElement.textContent = 'Critical error: ' + e.message;
+            }
+        }
+
+        // Initialize when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fetch the capture context first
+            fetchCaptureContext();
+            
+            // Add event listener to initialize button
+            document.getElementById('initialize-button').addEventListener('click', function() {
+                if (!captureContext) {
+                    const statusElement = document.getElementById('status');
+                    statusElement.className = 'error';
+                    statusElement.textContent = 'Error: Capture context not loaded yet. Please wait for it to load from the server.';
+                    return;
+                }
+                initializeUnifiedCheckout();
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,309 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background-color: var(--light-color);
+  border-bottom: 1px solid #eaeaea;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+}
+
+.logo {
+  font-weight: bold;
+  color: var(--secondary-color);
+}
+
+.hero {
+  background: linear-gradient(to right, var(--secondary-color), var(--primary-color));
+  color: white;
+  padding: 6rem 0;
+}
+
+.heroContent {
+  text-align: center;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.title {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+}
+
+.highlight {
+  color: var(--accent-color);
+  position: relative;
+  display: inline-block;
+}
+
+.highlight::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: var(--accent-color);
+}
+
+.description {
+  font-size: 1.25rem;
+  line-height: 1.7;
+  margin-bottom: 2rem;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.ctaButton {
+  font-size: 1.2rem;
+  padding: 1rem 2rem;
+  background-color: var(--accent-color);
+}
+
+.guarantee {
+  margin-top: 1rem;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+.features {
+  background-color: var(--light-color);
+}
+
+.sectionTitle {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 3rem;
+  color: var(--secondary-color);
+}
+
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.featureCard {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.featureCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.featureCard h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--primary-color);
+}
+
+.pricing {
+  background-color: white;
+}
+
+.pricingBox {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 3rem;
+  background-color: var(--light-color);
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+.pricingBox h3 {
+  color: var(--secondary-color);
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+}
+
+.pricingFeatures {
+  list-style-type: none;
+  padding: 0;
+  margin: 0 0 2rem 0;
+  text-align: left;
+}
+
+.pricingFeatures li {
+  padding: 0.5rem 0;
+  position: relative;
+  padding-left: 2rem;
+}
+
+.pricingFeatures li::before {
+  content: '✓';
+  color: var(--success-color);
+  position: absolute;
+  left: 0;
+  font-weight: bold;
+}
+
+.price {
+  margin: 2rem 0;
+}
+
+.amount {
+  font-size: 3.5rem;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.oneTime {
+  display: block;
+  font-size: 0.9rem;
+  opacity: 0.7;
+  margin-top: 0.5rem;
+}
+
+.enrollButton {
+  width: 100%;
+  font-size: 1.2rem;
+  padding: 1rem;
+}
+
+.testimonials {
+  background-color: var(--light-color);
+}
+
+.testimonialGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.testimonialCard {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.testimonialCard p {
+  font-style: italic;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.testimonialCard p::before {
+  content: '"';
+  font-size: 3rem;
+  color: rgba(0, 0, 0, 0.1);
+  position: absolute;
+  top: -1.5rem;
+  left: -1rem;
+}
+
+.testimonialAuthor {
+  display: flex;
+  flex-direction: column;
+}
+
+.testimonialAuthor span:first-child {
+  font-weight: bold;
+}
+
+.testimonialAuthor span:last-child {
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+.faq {
+  background-color: white;
+}
+
+.faqGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.faqItem h3 {
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+.finalCta {
+  background: linear-gradient(to right, var(--secondary-color), var(--primary-color));
+  color: white;
+  text-align: center;
+  padding: 5rem 0;
+}
+
+.finalCtaTitle {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.finalCtaText {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}
+
+.finalCtaButton {
+  font-size: 1.2rem;
+  padding: 1rem 2.5rem;
+  background-color: var(--accent-color);
+}
+
+.footer {
+  background-color: var(--dark-color);
+  color: white;
+  padding: 2rem 0;
+  text-align: center;
+  margin-top: auto;
+}
+
+.errorMessage {
+  color: #dc3545;
+  margin-top: 1rem;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .title {
+    font-size: 2.5rem;
+  }
+  
+  .description {
+    font-size: 1.1rem;
+  }
+  
+  .sectionTitle {
+    font-size: 2rem;
+  }
+  
+  .featureCard, .testimonialCard, .faqItem {
+    padding: 1.5rem;
+  }
+  
+  .pricingBox {
+    padding: 2rem;
+  }
+  
+  .hero, .finalCta {
+    padding: 4rem 0;
+  }
+}

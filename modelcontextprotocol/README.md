@@ -1,0 +1,146 @@
+# CyberSource MCP Server
+
+This is a Model Context Protocol (MCP) server that provides CyberSource payment processing capabilities, currently focused on refund functionality.
+
+## Features
+
+- **Refund Processing**: Process full or partial refunds for previous transactions
+- **MCP Integration**: Exposes CyberSource functionality via MCP tools
+- **Real API Calls**: Always makes real API calls to CyberSource (no simulations)
+- **Environment Control**: Easily switch between test and production environments
+
+## Installation
+
+1. Clone the repository
+2. Install dependencies:
+```bash
+cd cybersource-agent-toolkit/modelcontextprotocol
+npm install
+```
+
+## Configuration
+
+Create a `.env` file in the project root with your CyberSource API credentials:
+
+```
+# CyberSource API Credentials
+CYBERSOURCE_MERCHANT_ID=your_merchant_id
+CYBERSOURCE_API_KEY_ID=your_api_key_id
+CYBERSOURCE_SECRET_KEY=your_secret_key
+
+# Environment Configuration
+# When true, points to apitest.cybersource.com (non-production)
+# When false, points to api.cybersource.com (production)
+CYBERSOURCE_USE_TEST_ENV=true
+CYBERSOURCE_AUTH_TYPE=http_signature
+```
+
+You can copy the `.env.template` file to get started:
+
+```bash
+cp .env.template .env
+```
+
+## Usage
+
+### Starting the MCP Server
+
+```bash
+node index.js
+```
+
+### Using in Roo
+
+The CyberSource MCP server can be added to your MCP settings configuration file (located in your Claude/Roo app settings):
+
+```json
+{
+  "mcpServers": {
+    "cybersource": {
+      "command": "node",
+      "args": ["/path/to/cybersource-agent-toolkit/modelcontextprotocol/index.js"],
+      "env": {
+        "CYBERSOURCE_MERCHANT_ID": "your_merchant_id",
+        "CYBERSOURCE_API_KEY_ID": "your_api_key_id",
+        "CYBERSOURCE_SECRET_KEY": "your_secret_key",
+        "CYBERSOURCE_USE_TEST_ENV": "true",
+        "CYBERSOURCE_AUTH_TYPE": "http_signature"
+      },
+      "disabled": false,
+      "alwaysAllow": []
+    }
+  }
+}
+```
+
+After adding the server to your MCP configuration, you can use the following tool:
+
+- `process_refund`: Process a refund for a previous transaction
+
+Example usage in Claude/Roo:
+```
+I need to process a refund for transaction ID 6246558305476543904324
+```
+
+## Tools
+
+### process_refund
+
+Process a refund for a previous transaction.
+
+**Input Parameters:**
+- `transaction_id` (required): The ID of the transaction to refund
+- `amount` (optional): The amount to refund. If not provided, a full refund will be processed
+
+**Example Success Response:**
+```json
+{
+  "success": true,
+  "id": "5678901234567890",
+  "status": "PENDING",
+  "processor_response": "100",
+  "transaction_id": "6246558305476543904324",
+  "amount": 50.00,
+  "created": "2025-03-18T20:15:30.123Z"
+}
+```
+
+**Example Error Response:**
+```json
+{
+  "success": false,
+  "error": "Transaction not found",
+  "transaction_id": "invalid_transaction_id"
+}
+```
+
+## Testing
+
+You can test the refund functionality directly using the included test script:
+
+```bash
+node direct-refund-test.js [transaction_id] [amount]
+```
+
+This will:
+1. Load your environment variables from .env
+2. Connect directly to the CyberSource API
+3. Process a refund with the specified transaction ID and amount
+4. Display the results
+
+For testing the MCP server implementation:
+```bash
+node test-mcp-refund.js [transaction_id] [amount]
+```
+
+For example:
+```bash
+# Process a $40 refund for a specific transaction
+node direct-refund-test.js 7423472032006126403813 40
+```
+
+The test environment (`apitest.cybersource.com`) is used by default. The successful response includes the new refund transaction ID and status.
+
+## License
+
+MIT

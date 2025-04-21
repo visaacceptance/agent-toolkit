@@ -1,0 +1,52 @@
+{
+  "name": "@cybersource/agent-toolkit-mcp",
+  "version": "0.1.0",
+  "description": "CyberSource Agent Toolkit with MCP integration for refund functionality",
+  "type": "commonjs",
+  "main": "index.js",
+  "bin": {
+    "cybersource-mcp": "index.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "lint": "eslint .",
+"demo": "node demo-server.js",
+"test": "jest"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.4.1",
+    "axios": "^1.6.0",
+    "body-parser": "^1.20.2",
+    "cybersource-rest-client": "^0.0.45",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jwk-to-pem": "^2.0.7",
+    "openai": "^4.87.4",
+    "uuid": "^9.0.1",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "eslint": "^8.52.0",
+    "nodemon": "^3.0.1",
+    "prettier": "^3.0.3"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "keywords": [
+    "cybersource",
+    "agent",
+    "toolkit",
+    "mcp",
+    "model-context-protocol",
+    "refund"
+  ],
+  "author": "Your Organization",
+  "license": "MIT",
+  "files": [
+    "index.js",
+    "README.md",
+    "LICENSE"
+  ]
+}

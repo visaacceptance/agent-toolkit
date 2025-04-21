@@ -1,0 +1,78 @@
+'use strict';
+
+/*
+* Merchant configuration properties are taken from Configuration module
+*/
+
+// Load environment variables from .env file if present
+require('dotenv').config();
+
+// common parameters
+const AuthenticationType = process.env.CYBERSOURCE_AUTH_TYPE || 'http_signature';
+const RunEnvironment = 'apitest.cybersource.com';
+const MerchantId = process.env.CYBERSOURCE_MERCHANT_ID || 'visa_acceptance_llm_01';
+
+// http_signature parameters
+const MerchantKeyId = process.env.CYBERSOURCE_API_KEY_ID || '9809ebfb-e5ce-43af-8f2d-90f65770c4bc';
+const MerchantSecretKey = process.env.CYBERSOURCE_SECRET_KEY || 'K3UY4P0qRlca7fdjzRmVl0yBSefaXZ8OcDhMag9WDtk=';
+
+// jwt parameters
+const KeysDirectory = 'Resource';
+const KeyFileName = process.env.CYBERSOURCE_KEY_FILENAME || 'testrest';
+const KeyAlias = process.env.CYBERSOURCE_KEY_ALIAS || 'testrest';
+const KeyPass = process.env.CYBERSOURCE_KEY_PASSWORD || 'testrest';
+
+//meta key parameters
+const UseMetaKey = false;
+const PortfolioID = '';
+
+// logging parameters
+const EnableLog = process.env.ENABLE_LOGGING || 'false';
+const LogFileName = process.env.LOG_FILENAME || 'cybs';
+const LogDirectory = './log';
+const LogfileMaxSize = process.env.LOG_FILE_MAX_SIZE || '5242880'; //10 MB In Bytes
+const EnableMasking = true;
+
+/*
+PEM Key file path for decoding JWE Response Enter the folder path where the .pem file is located.
+It is optional property, require adding only during JWE decryption.
+*/
+const PemFileDirectory = 'Resource/NetworkTokenCert.pem';
+
+//Add the property if required to override the cybs default developerId in all request body
+const DefaultDeveloperId = '';
+
+// Constructor for Configuration
+function Configuration() {
+
+    var configObj = {
+        'authenticationType': AuthenticationType,
+        'runEnvironment': RunEnvironment,
+
+        'merchantID': MerchantId,
+        'merchantKeyId': MerchantKeyId,
+        'merchantSecretKey': MerchantSecretKey,
+
+        'keyAlias': KeyAlias,
+        'keyPass': KeyPass,
+        'keyFileName': KeyFileName,
+        'keysDirectory': KeysDirectory,
+
+        'useMetaKey': UseMetaKey,
+        'portfolioID': PortfolioID,
+        'pemFileDirectory': PemFileDirectory,
+        'defaultDeveloperId': DefaultDeveloperId,
+        'logConfiguration': {
+            'enableLog': EnableLog,
+            'logFileName': LogFileName,
+            'logDirectory': LogDirectory,
+            'logFileMaxSize': LogfileMaxSize,
+            'loggingLevel': 'debug',
+            'enableMasking': EnableMasking
+        }
+    };
+    return configObj;
+
+}
+
+module.exports = Configuration;
