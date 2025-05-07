@@ -1,44 +1,42 @@
-import {z} from 'zod';
-import type {Context} from './configuration';
-import { createInvoiceSchema, createPaymentLinkSchema } from './parameters';
-import { createInvoicePrompt, createPaymentLinkPrompt } from './prompts';
+import { z } from 'zod';
+import { VisaContext } from './types';
 
+
+// Import invoice tools
+import createInvoiceToolModule from './invoices/createInvoice';
+import listInvoicesToolModule from './invoices/listInvoices';
+import getInvoiceToolModule from './invoices/getInvoice';
+import updateInvoiceToolModule from './invoices/updateInvoice';
+
+/**
+ * Tool interface defining the structure of a tool
+ */
 export type Tool = {
-    method: string;
-    name: string;
-    description: string;
-    parameters: z.ZodObject<any, any, any, any>;
-    actions: {
-      [key: string]: {
-        [action: string]: boolean;
-      };
-    };
-  };
-
-  const tools = (context: Context): Tool[] => [
-    {
-      method: 'create_payment_link',
-      name: 'Create Payment Link',
-      description: createPaymentLinkPrompt(context),
-      parameters: createPaymentLinkSchema,
-      actions: {
-        paymentLinks: {
-          create: true,
-        },
-      },
-    },
-    {
-      method: 'create_invoice',
-      name: 'Create Invoice',
-      description: createInvoicePrompt(context),
-      parameters: createInvoiceSchema,
-      actions: {
-        invoices: {
-          create: true,
-        },
-      },
+  method: string;                // Unique identifier for the tool
+  name: string;                  // Display name
+  description: string;           // Description for AI consumption
+  parameters: z.ZodObject<any, any, any, any>;
+  actions: {                     // Permission structure
+    [resource: string]: {
+      [action: string]: boolean;
     }
-  
+  };
+  execute: (visaClient: any, context: VisaContext, params: any) => Promise<any>;
+};
+
+
+/**
+ * Export a function that returns all tools with context applied
+ */
+export function tools(context: VisaContext): Tool[] {
+  return [
+    // Use the new modular invoice tools
+    createInvoiceToolModule(context),
+    listInvoicesToolModule(context),
+    getInvoiceToolModule(context),
+    updateInvoiceToolModule(context)
   ];
-  
-  export default tools
+}
+
+// Also export as default for backward compatibility
+export default tools;

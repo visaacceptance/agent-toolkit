@@ -1,15 +1,15 @@
-import CybersourceAgentToolkit from './toolkit';
-import CybersourceTool from './tool';
+import VisaAcceptanceAgentToolkit from './toolkit';
+import VisaAcceptanceTool from './tool';
 
 // Export the toolkit and tool creator
 export {
-  CybersourceAgentToolkit,
-  CybersourceTool
+  VisaAcceptanceAgentToolkit,
+  VisaAcceptanceTool
 };
 
 // Export a default instance of the toolkit for ease of use
-export default new CybersourceAgentToolkit(
-  process.env.CYBERSOURCE_SECRET_KEY,
-  process.env.CYBERSOURCE_MERCHANT_ID,
-  process.env.CYBERSOURCE_API_KEY_ID
+export default new VisaAcceptanceAgentToolkit(
+  process.env.VISA_ACCEPTANCE_SECRET_KEY,
+  process.env.VISA_ACCEPTANCE_MERCHANT_ID,
+  process.env.VISA_ACCEPTANCE_API_KEY_ID
 );

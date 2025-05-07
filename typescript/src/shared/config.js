@@ -8,19 +8,19 @@
 require('dotenv').config();
 
 // common parameters
-const AuthenticationType = process.env.CYBERSOURCE_AUTH_TYPE || 'http_signature';
+const AuthenticationType = process.env.VISA_ACCEPTANCE_AUTH_TYPE || 'http_signature';
 const RunEnvironment = 'apitest.cybersource.com';
-const MerchantId = process.env.CYBERSOURCE_MERCHANT_ID || 'visa_acceptance_llm_01';
+const MerchantId = process.env.VISA_ACCEPTANCE_MERCHANT_ID || 'visa_acceptance_llm_01';
 
 // http_signature parameters
-const MerchantKeyId = process.env.CYBERSOURCE_API_KEY_ID || '9809ebfb-e5ce-43af-8f2d-90f65770c4bc';
-const MerchantSecretKey = process.env.CYBERSOURCE_SECRET_KEY || 'K3UY4P0qRlca7fdjzRmVl0yBSefaXZ8OcDhMag9WDtk=';
+const MerchantKeyId = process.env.VISA_ACCEPTANCE_API_KEY_ID || '9809ebfb-e5ce-43af-8f2d-90f65770c4bc';
+const MerchantSecretKey = process.env.VISA_ACCEPTANCE_SECRET_KEY || 'K3UY4P0qRlca7fdjzRmVl0yBSefaXZ8OcDhMag9WDtk=';
 
 // jwt parameters
 const KeysDirectory = 'Resource';
-const KeyFileName = process.env.CYBERSOURCE_KEY_FILENAME || 'testrest';
-const KeyAlias = process.env.CYBERSOURCE_KEY_ALIAS || 'testrest';
-const KeyPass = process.env.CYBERSOURCE_KEY_PASSWORD || 'testrest';
+const KeyFileName = process.env.VISA_ACCEPTANCE_KEY_FILENAME || 'testrest';
+const KeyAlias = process.env.VISA_ACCEPTANCE_KEY_ALIAS || 'testrest';
+const KeyPass = process.env.VISA_ACCEPTANCE_KEY_PASSWORD || 'testrest';
 
 //meta key parameters
 const UseMetaKey = false;

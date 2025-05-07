@@ -8,29 +8,24 @@
     "skipLibCheck": true,
     "declaration": true,
     "outDir": "./dist",
-    "rootDir": "./",
+    "rootDir": "./src",
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "lib": ["ES2020", "DOM"],
     "types": ["node"],
     "baseUrl": ".",
-    "composite": true,
     "typeRoots": ["./node_modules/@types", "./types"],
-    "paths": {
-      "../typescript/src/shared/*": ["../typescript/src/shared/*"]
-    }
+    "composite": true
   },
   "include": [
-    "*.ts",
     "src/**/*.ts",
     "types/**/*.d.ts"
   ],
-  "references": [
-    { "path": "../typescript" }
-  ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts"
   ]
 }

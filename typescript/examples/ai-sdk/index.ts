@@ -3,7 +3,7 @@
 // 2) "'name' does not exist on type 'ChatCompletionTool'" – The openai/resources ChatCompletionTool type doesn't support 'name' as a property.
 // 3) We'll define each tool as a property in a simple object, keyed by the tool's name, with the shape ChatCompletionTool expects (description, parameters).
 
-import { CybersourceAgentToolkit } from '../../src/ai-sdk';
+import { VisaAcceptanceAgentToolkit } from '../../src/ai-sdk';
 import { createOpenAI } from '@ai-sdk/openai';
 import { generateText } from 'ai';
 
@@ -33,38 +33,38 @@ process.env.no_proxy = '.visa.com';
 // Sample config
 const configuration = {
   actions: {
-    paymentLinks: {
+    invoices: {
       create: true,
     }
   },
 };
 
-if (!process.env.CYBERSOURCE_SECRET_KEY || !process.env.CYBERSOURCE_MERCHANT_ID || !process.env.CYBERSOURCE_API_KEY_ID) {
+if (!process.env.VISA_ACCEPTANCE_SECRET_KEY || !process.env.VISA_ACCEPTANCE_MERCHANT_ID || !process.env.VISA_ACCEPTANCE_API_KEY_ID) {
   console.error('Missing required environment variables. Please check your .env file.');
   process.exit(1);
 }
 
-// Initialize the CyberSource agent
-const cybersourceAgentToolkit = new CybersourceAgentToolkit(
-  process.env.CYBERSOURCE_SECRET_KEY,
-  process.env.CYBERSOURCE_MERCHANT_ID,
-  process.env.CYBERSOURCE_API_KEY_ID,
+// Initialize the Visa Acceptance agent
+const visaAcceptanceAgentToolkit = new VisaAcceptanceAgentToolkit(
+  process.env.VISA_ACCEPTANCE_SECRET_KEY,
+  process.env.VISA_ACCEPTANCE_MERCHANT_ID,
+  process.env.VISA_ACCEPTANCE_API_KEY_ID,
   configuration
 );
 
 
 
-async function aiGeneratedPaymentLink() {
+async function aiGeneratedInvoice() {
   console.log('Running AI-based example with custom Tools...');
 
-  const userPrompt = `Create a payment link for Ski Resort Package priced at $499.99`;
+  const userPrompt = `Create an invoice for Ski Resort Package priced at $499.99`;
 
   try {
     const result = await generateText({
       model: openai('gpt-4o'),
       
       tools: {
-        ...cybersourceAgentToolkit.getTools(),
+        ...visaAcceptanceAgentToolkit.getTools(),
       },
       maxSteps: 5,
       prompt: userPrompt,
@@ -76,4 +76,4 @@ async function aiGeneratedPaymentLink() {
   }
 }
 
-aiGeneratedPaymentLink();
+aiGeneratedInvoice();

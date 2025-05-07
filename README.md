@@ -1,52 +1,135 @@
 # Visa Acceptance Agent Toolkit
 
-## Quick Example: Creating a Payment Link
+The Visa Acceptance Agent Toolkit enables popular agent frameworks including OpenAI's Agent SDK, Vercel's AI SDK, and Model Context Protocol (MCP) to integrate with Visa Acceptance APIs through function calling. The library provides tools for invoice management and payment operations specifically for Visa Acceptance services.
 
-```typescript
-import { openAiClient } from '@mcp/ai-sdk';
+Included below are basic instructions, but refer to the [TypeScript](/typescript) package for more information.
 
-async function createPaymentLink() {
-  const response = await openAiClient.callTool('create-payment-link', {
-    linkType: 'PURCHASE',
-    purchaseNumber: 'YOUR_PURCHASE_NUMBER',
-    currency: 'USD',
-    totalAmount: '10.00',
-    lineItems: [
-      {
-        productName: 'Example Product',
-        quantity: '1',
-        unitPrice: '10.00',
-        totalAmount: '10.00'
-      }
-    ]
-  });
-  console.log('Created payment link:', response);
-}
+## TypeScript
+
+### Installation
+
+You don't need this source code unless you want to modify the package. If you just
+want to use the package run:
+
+```sh
+npm install @visa/acceptance-agent-toolkit
 ```
 
-The Visa Acceptance Agent Toolkit is a library designed to help AI assistants interact with the Visa Acceptance API through the Model Context Protocol (MCP). It provides tools that make it easy to perform payment operations with Visa Acceptance, currently focused on refund processing.
+#### Requirements
 
-## Features
+- Node 18+
 
-- Process refunds for transactions
-- Built-in test mode for development without making real API calls
-- MCP integration for AI model function calling
-- Comprehensive error handling and logging
+### Usage
 
-## Implementations
+The library needs to be configured with your Visa Acceptance account credentials which are available in your Visa Acceptance Dashboard.
 
-### TypeScript
+```typescript
+import { VisaAcceptanceAgentToolkit } from "@visa/acceptance-agent-toolkit/ai-sdk";
 
-The TypeScript implementation provides an MCP server that can be used with any MCP-compatible client to process refunds through the Visa Acceptance API.
+const visaAcceptanceAgentToolkit = new VisaAcceptanceAgentToolkit({
+  merchantId: process.env.MERCHANT_ID!,
+  apiKeyId: process.env.API_KEY_ID!,
+  secretKey: process.env.SECRET_KEY!,
+  configuration: {
+    actions: {
+      invoices: {
+        create: true,
+        update: true,
+        list: true,
+        get: true,
+      },
+    },
+  },
+});
+```
 
-Key features:
-- Full MCP server implementation
-- Command-line interface for easy setup
-- Environment variable support
-- Test mode for development
-- Comprehensive logging
+The toolkit works with Vercel's AI SDK and can be passed as a list of tools. For example:
 
-[See TypeScript README](./typescript/README.md)
+```typescript
+import { AI } from "@vercel/ai";
+
+const tools = visaAcceptanceAgentToolkit.getTools();
+
+const ai = new AI({
+  tools,
+});
+
+// Use the tools with Vercel AI SDK
+const response = await ai.run({
+  messages: [{ role: 'user', content: 'Create an invoice for $100' }],
+});
+```
+
+#### Context
+
+In some cases you will want to provide values that serve as defaults when making requests. Currently, the environment context value enables you to switch between test and production environments.
+
+```typescript
+const visaAcceptanceAgentToolkit = new VisaAcceptanceAgentToolkit({
+  merchantId: process.env.MERCHANT_ID!,
+  apiKeyId: process.env.API_KEY_ID!,
+  secretKey: process.env.SECRET_KEY!,
+  configuration: {
+    context: {
+      useTestEnvironment: true,
+    },
+  },
+});
+```
+
+## Model Context Protocol
+
+The Visa Acceptance Agent Toolkit also supports the [Model Context Protocol (MCP)](https://modelcontextprotocol.com/).
+
+To run the Visa Acceptance MCP server using npx, use the following command:
+
+```bash
+npx -y @visa/acceptance-mcp --tools=all --merchant-id=YOUR_MERCHANT_ID --api-key-id=YOUR_API_KEY_ID --secret-key=YOUR_SECRET_KEY
+```
+
+Replace the credential placeholders with your actual Visa Acceptance credentials. Or, you could set these values in your environment variables.
+
+Alternatively, you can set up your own MCP server. For example:
+
+```typescript
+import { VisaAcceptanceAgentToolkit } from "@visa/acceptance-agent-toolkit/modelcontextprotocol";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+
+const server = new VisaAcceptanceAgentToolkit({
+  merchantId: process.env.MERCHANT_ID!,
+  apiKeyId: process.env.API_KEY_ID!,
+  secretKey: process.env.SECRET_KEY!,
+  configuration: {
+    actions: {
+      invoices: {
+        create: true,
+        update: true,
+        list: true,
+        get: true,
+      },
+    },
+  },
+});
+
+async function main() {
+  const transport = new StdioServerTransport();
+  await server.connect(transport);
+  console.error("Visa Acceptance MCP Server running on stdio");
+}
+
+main().catch((error) => {
+  console.error("Fatal error in main():", error);
+  process.exit(1);
+});
+```
+
+## Supported API methods
+
+- [Create an invoice](https://developer.visa-acceptance.com/api/invoices/create)
+- [Update an invoice](https://developer.visa-acceptance.com/api/invoices/update)
+- [List all invoices](https://developer.visa-acceptance.com/api/invoices/list)
+- [Get invoice details](https://developer.visa-acceptance.com/api/invoices/get)
+- [Process a refund](https://developer.visa-acceptance.com/api/refunds/process)
 
 ## Authentication
 
@@ -57,88 +140,20 @@ The Visa Acceptance Agent Toolkit uses Visa Acceptance API credentials which inc
 
 These can be obtained from your Visa Acceptance account dashboard.
 
-## Getting Started
+## Quick Example: Creating an Invoice
 
-### Prerequisites
+```typescript
+import { openAiClient } from '@mcp/ai-sdk';
 
-- Node.js 16.x or higher
-- npm or yarn package manager
-- Visa Acceptance API credentials
-
-### Installation
-
-From the TypeScript directory:
-
-```bash
-cd typescript
-npm install
-npm run build
+async function createInvoice() {
+  const response = await openAiClient.callTool('create_invoice', {
+    invoice_number: 'YOUR_INVOICE_NUMBER',
+    currency: 'USD',
+    totalAmount: '10.00'
+  });
+  console.log('Created invoice:', response);
+}
 ```
-
-### Configuration
-
-Create a `.env` file based on the provided template:
-
-```bash
-cp .env.template .env
-```
-
-Edit the `.env` file with your Visa Acceptance API credentials.
-
-### Running the MCP Server
-
-```bash
-npm start
-```
-
-Or with command-line arguments:
-
-```bash
-npm start -- --merchant-id=your_merchant_id --api-key-id=your_api_key_id --secret-key=your_secret_key
-```
-
-### Testing Refund Functionality
-
-A test script is provided to validate refund processing:
-
-```bash
-node test-refund.js <transaction_id> [amount]
-```
-
-### Quick Start for the MCP Server
-
-Here is a quick guide to set up and run this MCP server:
-
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-2. Configure your environment variables (e.g., VISA_ACCEPTANCE_MERCHANT_ID, VISA_ACCEPTANCE_API_KEY_ID, VISA_ACCEPTANCE_SECRET_KEY).
-3. To start the MCP server, run:
-   ```bash
-   npm start
-   ```
-4. The server should now be running on stdio and ready to process MCP tool requests.
-5. You can invoke available tools (e.g. create_payment_link, process_refund) by sending MCP tool requests to the server.
-
-## Supported Tools
-
-The Visa Acceptance Agent Toolkit currently supports these MCP Tools:
-
-1. process_refund  
-   Processes a refund for a transaction.
-2. greeting  
-   Returns a greeting message.
-3. checkout.create_context  
-   Creates a capture context for payment processing.
-4. create_payment_link  
-   Creates a pay-by-link for a specified purchase.
-5. create_invoice  
-   Creates an invoice using the Visa Acceptance Node.js SDK for invoice creation.
-
-## MCP Toolkit Support
-
-This library supports the Model Context Protocol (MCP), enabling easy integration with Visa Acceptance for creating and managing payment links, processing refunds, and more. For more usage details, see the TypeScript examples and readme.
 
 ## License
 

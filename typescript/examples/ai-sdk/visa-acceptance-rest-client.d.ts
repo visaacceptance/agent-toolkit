@@ -1,0 +1,1 @@
+declare module 'visa-acceptance-rest-client';

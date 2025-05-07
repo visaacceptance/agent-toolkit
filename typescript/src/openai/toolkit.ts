@@ -1,7 +1,7 @@
 import type { CoreTool } from 'ai';
 import CybersourceAPI from '../shared/api';
+import { VisaContext } from '../shared/types';
 import { z } from 'zod';
-import { createPaymentLinkSchema } from '../shared/parameters';
 import type {
   ChatCompletionTool,
   ChatCompletionMessageToolCall,
@@ -67,13 +67,20 @@ class CybersourceAgentToolkit {
    */
   constructor(options: CybersourceAgentToolkitOptions = {}) {
     this.credentials = {
-      secretKey: options.secretKey || process.env.CYBERSOURCE_SECRET_KEY,
-      merchantId: options.merchantId || process.env.CYBERSOURCE_MERCHANT_ID,
-      merchantKeyId: options.merchantKeyId || process.env.CYBERSOURCE_API_KEY_ID
+      secretKey: options.secretKey || process.env.VISA_ACCEPTANCE_SECRET_KEY,
+      merchantId: options.merchantId || process.env.VISA_ACCEPTANCE_MERCHANT_ID,
+      merchantKeyId: options.merchantKeyId || process.env.VISA_ACCEPTANCE_API_KEY_ID
     };
 
     // Initialize API client with credentials
-    this.cybersourceApi = new CybersourceAPI(this.credentials);
+    // Convert credentials to match VisaContext type
+    const visaContext: VisaContext = {
+      merchantId: this.credentials.merchantId || '',
+      apiKeyId: this.credentials.merchantKeyId || '',
+      secretKey: this.credentials.secretKey || '',
+      environment: 'SANDBOX'
+    };
+    this.cybersourceApi = new CybersourceAPI(visaContext);
     
     // Set configuration with defaults
     this.configuration = options.configuration || {
@@ -111,7 +118,7 @@ class CybersourceAgentToolkit {
    */
   async handleToolCall(toolCall: ChatCompletionMessageToolCall) {
     const args = JSON.parse(toolCall.function.arguments);
-    const response = await this.cybersourceApi.run(toolCall.function.name, args);
+    const response = await (this.cybersourceApi as any).run(toolCall.function.name, args);
     return {
       role: 'tool',
       tool_call_id: toolCall.id,
