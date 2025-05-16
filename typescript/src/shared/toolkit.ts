@@ -10,6 +10,7 @@ import dotenv from 'dotenv';
 import { Context } from './configuration';
 import tools from './tools';
 import { Tool } from './tools';
+import VisaAcceptanceAPI from './api';
 // Parameter types still needed for type checking
 
 
@@ -298,7 +299,7 @@ export class VisaAcceptanceAgentToolkit {
       const args = request.params.arguments;
       
       // Map from MCP name format to our internal method name
-      let toolName;
+      let toolName: string;
       if (mcpNameToMethod[mcpToolName]) {
         // Use the mapped method name if available
         toolName = mcpNameToMethod[mcpToolName];
@@ -313,48 +314,22 @@ export class VisaAcceptanceAgentToolkit {
       console.error(`Tool requested: ${mcpToolName} → ${toolName}`);
       console.error(`Arguments: ${JSON.stringify(args, null, 2)}`);
 
-      // Use mock responses instead of Cybersource API client
+      // Use real Cybersource API client calls
       try {
-        let result;
-        switch (toolName) {
-          case 'create_invoice':
-            result = {
-              invoice_id: 'INV-' + Date.now(),
-              status: 'CREATED',
-              amount: args.totalAmount,
-              currency: args.currency
-            };
-            break;
-          case 'list_invoices':
-            result = {
-              invoices: [
-                { id: 'INV-001', amount: '100.00', currency: 'USD', status: 'PENDING' },
-                { id: 'INV-002', amount: '200.00', currency: 'USD', status: 'PAID' }
-              ],
-              offset: args.offset,
-              limit: args.limit,
-              total: 2
-            };
-            break;
-          case 'get_invoice':
-            result = {
-              invoice: {
-                id: args.id,
-                amount: '150.00',
-                currency: 'USD',
-                status: 'PENDING'
-              }
-            };
-            break;
-          case 'update_invoice':
-            result = {
-              invoice_id: args.id,
-              status: 'UPDATED'
-            };
-            break;
-          default:
-            throw new Error(`Unknown tool: ${toolName}`);
+        // Find the appropriate tool from toolDefinitions based on the tool name
+        const tool = toolDefinitions.find((t: Tool) => t.method === toolName);
+        
+        if (!tool) {
+          throw new Error(`Unknown tool: ${toolName}`);
         }
+        
+        console.error(`Executing tool: ${tool.name} (${tool.method})`);
+        
+        // Create the Visa API client
+        const visaClient = new VisaAcceptanceAPI(this.visaContext)._apiClient;
+        
+        // Call the tool's execute method with the Visa client, context, and arguments
+        const result = await tool.execute(visaClient, this.visaContext, args);
 
         return this.formatResponse({ success: true, result });
       } catch (error) {
@@ -365,7 +340,6 @@ export class VisaAcceptanceAgentToolkit {
     });
   }
 
-  // Method removed as we're now using mock responses directly
 
   /**
    * Format the response for the MCP server
@@ -382,7 +356,6 @@ export class VisaAcceptanceAgentToolkit {
     };
   }
 
-  // Methods removed as we're now using mock responses directly
 
   /**
    * Connect and run the MCP server

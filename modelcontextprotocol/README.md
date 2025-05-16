@@ -1,20 +1,84 @@
 # Visa Acceptance Model Context Protocol
 
-The Visa Acceptance [Model Context Protocol](https://modelcontextprotocol.com/) server allows you to integrate with Visa Acceptance APIs through function calling. This protocol supports various tools to interact with different Visa Acceptance services.
+The Visa Acceptance [Model Context Protocol](https://modelcontextprotocol.com/) server allows you to integrate with Visa Acceptance APIs through function calling. This protocol supports various tools to interact with different Visa Acceptance services, including enhanced invoice management with customer information and additional invoice parameters.
 
-## Setup
+## Local Development
+
+This package is designed to be used as a local npm package during development. Follow these steps to set up the package for local development:
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/visa-acceptance/agent-toolkit.git
+   cd agent-toolkit/modelcontextprotocol
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Build the package:
+   ```bash
+   npm run build
+   ```
+
+### Local Package Linking
+
+To use this package locally in another project:
+
+1. Link the package globally:
+   ```bash
+   npm link
+   ```
+
+2. In your project directory, link to the package:
+   ```bash
+   npm link @visaacceptance/mcp
+   ```
+
+3. You can now import and use the package in your project:
+   ```javascript
+   import { VisaAcceptanceAgentToolkit } from '@visaacceptance/mcp';
+   // or
+   const { VisaAcceptanceAgentToolkit } = require('@visaacceptance/mcp');
+   ```
+
+### Development Workflow
+
+1. Make changes to the source code
+2. Rebuild the package:
+   ```bash
+   npm run build
+   ```
+3. The linked projects will automatically use the updated version
+
+### Testing
+
+Run tests to ensure everything is working correctly:
+```bash
+npm test
+```
+
+Run integration tests:
+```bash
+npm run test:integration
+```
+
+## Usage
 
 To run the Visa Acceptance MCP server using npx, use the following command:
 
 ```bash
 # To set up all available tools
-npx -y @visa/acceptance-mcp --tools=all --merchant-id=YOUR_MERCHANT_ID --api-key-id=YOUR_API_KEY_ID --secret-key=YOUR_SECRET_KEY
+npx -y @visaacceptance/mcp --tools=all --merchant-id=YOUR_MERCHANT_ID --api-key-id=YOUR_API_KEY_ID --secret-key=YOUR_SECRET_KEY
 
 # To set up specific tools
-npx -y @visa/acceptance-mcp --tools=invoices.create,invoices.list,invoices.get --merchant-id=YOUR_MERCHANT_ID --api-key-id=YOUR_API_KEY_ID --secret-key=YOUR_SECRET_KEY
+npx -y @visaacceptance/mcp --tools=invoices.create,invoices.list,invoices.get --merchant-id=YOUR_MERCHANT_ID --api-key-id=YOUR_API_KEY_ID --secret-key=YOUR_SECRET_KEY
 
 # To configure test environment (default is true)
-npx -y @visa/acceptance-mcp --tools=all --merchant-id=YOUR_MERCHANT_ID --api-key-id=YOUR_API_KEY_ID --secret-key=YOUR_SECRET_KEY --use-test-env=true
+npx -y @visaacceptance/mcp --tools=all --merchant-id=YOUR_MERCHANT_ID --api-key-id=YOUR_API_KEY_ID --secret-key=YOUR_SECRET_KEY --use-test-env=true
 ```
 
 Make sure to replace the credential placeholders with your actual Visa Acceptance credentials. Alternatively, you could set these values in your environment variables.
@@ -30,7 +94,7 @@ Add the following to your `claude_desktop_config.json`. See [here](https://model
       "command": "npx",
       "args": [
           "-y",
-          "@visa/acceptance-mcp",
+          "@visaacceptance/mcp",
           "--tools=all",
           "--merchant-id=YOUR_MERCHANT_ID",
           "--api-key-id=YOUR_API_KEY_ID",
@@ -65,13 +129,13 @@ or if you're using Docker
 
 ## Available tools
 
-| Tool                   | Description                     |
-| ---------------------- | ------------------------------- |
-| `invoices.create`      | Create a new invoice            |
-| `invoices.update`      | Update an existing invoice      |
-| `invoices.list`        | List invoices                   |
-| `invoices.get`         | Get invoice details             |
-| `refunds.process`      | Process a refund transaction    |
+| Tool                   | Description                                                                |
+| ---------------------- | -------------------------------------------------------------------------- |
+| `invoices.create`      | Create a new invoice with customer info and enhanced invoice parameters    |
+| `invoices.update`      | Update an existing invoice including customer and invoice information      |
+| `invoices.list`        | List invoices with pagination support                                      |
+| `invoices.get`         | Get detailed invoice information                                           |
+| `refunds.process`      | Process a refund transaction                                               |
 
 ## Debugging the Server
 
@@ -143,3 +207,23 @@ You can copy the `.env.template` file to get started:
 
 ```bash
 cp .env.template .env
+```
+
+## Tool Parameters
+
+### invoices.create
+
+```json
+{
+  "invoice_number": "INV-12345",     // Required: Invoice number identifier
+  "totalAmount": "100.00",           // Required: Invoice total amount
+  "currency": "USD",                 // Required: Invoice currency code
+  "customer_name": "John Doe",       // Optional: Customer name
+  "customer_email": "john@example.com", // Optional: Customer email
+  "invoiceInformation": {            // Optional: Additional invoice parameters
+    "description": "Monthly subscription", // Optional: Invoice description
+    "sendImmediately": true,         // Optional: Whether to send immediately
+    "deliveryMode": "email"          // Optional: Delivery mode
+  }
+}
+```

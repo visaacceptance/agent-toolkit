@@ -22,7 +22,6 @@ export const getInvoice = async (
   params: z.infer<ReturnType<typeof getInvoiceParameters>>
 ) => {
   try {
-    console.log('Getting invoice with ID:', params.id);
     
     // Create the InvoicesApi instance with the client configuration
     const invoiceApiInstance = new cybersourceRestApi.InvoicesApi(visaClient.configuration, visaClient.visaApiClient);

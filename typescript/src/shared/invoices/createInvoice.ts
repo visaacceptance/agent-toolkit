@@ -10,7 +10,14 @@ export const createInvoiceParameters = (
   return z.object({
     invoice_number: z.string().describe('Invoice number identifier (required)'),
     totalAmount: z.string().describe('Invoice total amount e.g. "100.00" (required)'),
-    currency: z.string().describe('Invoice currency code e.g. "USD" (required)')
+    currency: z.string().describe('Invoice currency code e.g. "USD" (required)'),
+    customer_name: z.string().optional().describe('Customer name (optional)'),
+    customer_email: z.string().optional().describe('Customer email (optional)'),
+    invoiceInformation: z.object({
+      description: z.string().optional().describe('Invoice description (optional)'),
+      sendImmediately: z.boolean().optional().describe('Whether to send the invoice immediately (optional)'),
+      deliveryMode: z.string().optional().describe('Delivery mode e.g. "email" (optional)')
+    }).optional()
   });
 };
 
@@ -26,7 +33,7 @@ export const createInvoice = async (
   params: z.infer<ReturnType<typeof createInvoiceParameters>>
 ) => {
   try {
-    console.log('Creating invoice with params:', JSON.stringify(params, null, 2));
+    console.error('Creating invoice with parameters:', JSON.stringify(params, null, 2));
     
     // Create the InvoicesApi instance with the client configuration
     const invoiceApiInstance = new cybersourceRestApi.InvoicesApi(visaClient.configuration, visaClient.visaApiClient);
@@ -34,8 +41,8 @@ export const createInvoice = async (
     // Prepare the request body according to Cybersource API requirements
     const requestObj = {
       customerInformation: {
-        name: 'Customer', // Default value since not in schema
-        email: 'customer@example.com' // Default value since not in schema
+        name: params.customer_name || (params.customerInformation?.name), // Use provided name or default
+        email: params.customer_email || (params.customerInformation?.email) // Use provided email or default
       },
       orderInformation: {
         amountDetails: {
@@ -44,24 +51,29 @@ export const createInvoice = async (
         }
       },
       invoiceInformation: {
-        description: 'Invoice', // Default value since not in schema
+        description: params.invoiceInformation?.description,
         dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Default due date (30 days from now)
-        invoiceNumber: params.invoice_number
+        invoiceNumber: params.invoice_number,
+        sendImmediately: params.invoiceInformation?.sendImmediately !== undefined ? params.invoiceInformation.sendImmediately : true,
+        deliveryMode: params.invoiceInformation?.deliveryMode || 'email'
       }
     };
+    
+    console.error('Sending request to Cybersource API:', JSON.stringify(requestObj, null, 2));
     
     // Call the Cybersource API to create an invoice
     const result = await new Promise((resolve, reject) => {
       invoiceApiInstance.createInvoice(requestObj, (error: any, data: any) => {
         if (error) {
+          console.error('Error from Cybersource API:', error);
           reject(error);
         } else {
+          console.error('Response from Cybersource API:', JSON.stringify(data, null, 2));
           resolve(data);
         }
       });
     });
     
-    console.log('Created invoice:', JSON.stringify(result, null, 2));
     return result;
   } catch (error) {
     const errorMessage = error instanceof Error ?

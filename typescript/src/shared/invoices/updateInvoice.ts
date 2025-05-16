@@ -42,8 +42,6 @@ export const updateInvoice = async (
   params: z.infer<ReturnType<typeof updateInvoiceParameters>>
 ) => {
   try {
-    console.log('Updating invoice with params:', JSON.stringify(params, null, 2));
-    
     // Create the InvoicesApi instance with the client configuration
     const invoiceApiInstance = new cybersourceRestApi.InvoicesApi(visaClient.configuration, visaClient.visaApiClient);
     
@@ -68,7 +66,6 @@ export const updateInvoice = async (
       });
     });
     
-    console.log('Updated invoice:', JSON.stringify(result, null, 2));
     return result;
   } catch (error) {
     const errorMessage = error instanceof Error ?

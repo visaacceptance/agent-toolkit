@@ -55,7 +55,6 @@ const visaAcceptanceAgentToolkit = new VisaAcceptanceAgentToolkit(
 
 
 async function aiGeneratedInvoice() {
-  console.log('Running AI-based example with custom Tools...');
 
   const userPrompt = `Create an invoice for Ski Resort Package priced at $499.99`;
 
@@ -70,7 +69,6 @@ async function aiGeneratedInvoice() {
       prompt: userPrompt,
     });
 
-    console.log('AI result:', result);
   } catch (error) {
     console.error('Error generating text:', error);
   }

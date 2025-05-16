@@ -4,7 +4,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import dotenv from 'dotenv';
 import { green, yellow, red } from 'colors';
 // Import the toolkit from the package
-import { VisaAcceptanceAgentToolkit } from '@visa-acceptance/agent-toolkit';
+import { VisaAcceptanceAgentToolkit } from '@visaacceptance/agent-toolkit';
 
 
 
