@@ -35,6 +35,7 @@ const toolkit = new VisaAcceptanceAgentToolkit({
         list: true,
         get: true,
         send: true,
+        cancel: true
       },
       paymentLinks: {
         create: true,
@@ -44,32 +45,6 @@ const toolkit = new VisaAcceptanceAgentToolkit({
       },
     },
   },
-});
-```
-
-### Integrating with OpenAI's Agent SDK
-
-Below is a minimal sample of how you can integrate this toolkit with OpenAI's Agent SDK:
-
-```typescript
-import { Agent } from "@openai/agent-sdk";
-import { VisaAcceptanceAgentToolkit } from "@visaacceptance/agent-toolkit/ai-sdk";
-
-const toolkit = new VisaAcceptanceAgentToolkit({
-  merchantId: process.env.MERCHANT_ID!,
-  apiKeyId: process.env.API_KEY_ID!,
-  secretKey: process.env.SECRET_KEY!,
-});
-
-const agent = new Agent({
-  name: "Visa Acceptance Agent",
-  instructions: "You can manage Visa Acceptance invoices and payment links.",
-  tools: toolkit.getTools(),
-});
-
-// Example usage:
-const result = await agent.run({
-  messages: [{ role: "user", content: "Create a $100 invoice" }],
 });
 ```
 

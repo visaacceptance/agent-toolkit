@@ -1,6 +1,6 @@
 # Visa Acceptance Model Context Protocol
 
-The Visa Acceptance [Model Context Protocol](https://modelcontextprotocol.com/) server allows you to integrate with Visa Acceptance APIs through function calling. This protocol supports various tools to interact with different Visa Acceptance services, including enhanced invoice management with customer information and additional invoice parameters.
+The Visa Acceptance [Model Context Protocol](https://modelcontextprotocol.com/) server allows you to integrate with Visa Acceptance APIs through function calling. This protocol supports various tools to interact with different Visa Acceptance services, including enhanced invoice management, and payment links functionality.
 
 ## Local Development
 
@@ -74,8 +74,8 @@ To run the Visa Acceptance MCP server using npx, use the following command:
 # To set up all available tools
 npx -y @visaacceptance/mcp --tools=all --merchant-id=YOUR_MERCHANT_ID --api-key-id=YOUR_API_KEY_ID --secret-key=YOUR_SECRET_KEY
 
-# To set up specific tools
-npx -y @visaacceptance/mcp --tools=invoices.create,invoices.list,invoices.get --merchant-id=YOUR_MERCHANT_ID --api-key-id=YOUR_API_KEY_ID --secret-key=YOUR_SECRET_KEY
+# To set up specific tools 
+npx -y @visaacceptance/mcp --tools=invoices.create,invoices.list,paymentLinks.create,paymentLinks.list --merchant-id=YOUR_MERCHANT_ID --api-key-id=YOUR_API_KEY_ID --secret-key=YOUR_SECRET_KEY
 
 # To configure test environment (default is true)
 npx -y @visaacceptance/mcp --tools=all --merchant-id=YOUR_MERCHANT_ID --api-key-id=YOUR_API_KEY_ID --secret-key=YOUR_SECRET_KEY --use-test-env=true
@@ -127,15 +127,18 @@ or if you're using Docker
 }
 ```
 
-## Available tools
+## Available Tools
 
-| Tool                   | Description                                                                |
-| ---------------------- | -------------------------------------------------------------------------- |
-| `invoices.create`      | Create a new invoice with customer info and enhanced invoice parameters    |
-| `invoices.update`      | Update an existing invoice including customer and invoice information      |
-| `invoices.list`        | List invoices with pagination support                                      |
-| `invoices.get`         | Get detailed invoice information                                           |
-| `refunds.process`      | Process a refund transaction                                               |
+| Tool                    | Description                                                                |
+| ----------------------- | -------------------------------------------------------------------------- |
+| `invoices.create`       | Create a new invoice with customer info and enhanced invoice parameters    |
+| `invoices.update`       | Update an existing invoice including customer and invoice information      |
+| `invoices.list`         | List invoices with pagination support                                      |
+| `invoices.get`          | Get detailed invoice transaction                                               |
+| `paymentLinks.create`   | Create a new payment link with optional shipping info                      |
+| `paymentLinks.update`   | Update an existing payment link                                            |
+| `paymentLinks.list`     | List payment links with pagination                                         |
+| `paymentLinks.get`      | Retrieve details of a specific payment link                                |
 
 ## Debugging the Server
 
@@ -207,23 +210,4 @@ You can copy the `.env.template` file to get started:
 
 ```bash
 cp .env.template .env
-```
-
-## Tool Parameters
-
-### invoices.create
-
-```json
-{
-  "invoice_number": "INV-12345",     // Required: Invoice number identifier
-  "totalAmount": "100.00",           // Required: Invoice total amount
-  "currency": "USD",                 // Required: Invoice currency code
-  "customer_name": "John Doe",       // Optional: Customer name
-  "customer_email": "john@example.com", // Optional: Customer email
-  "invoiceInformation": {            // Optional: Additional invoice parameters
-    "description": "Monthly subscription", // Optional: Invoice description
-    "sendImmediately": true,         // Optional: Whether to send immediately
-    "deliveryMode": "email"          // Optional: Delivery mode
-  }
-}
 ```

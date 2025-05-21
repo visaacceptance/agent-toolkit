@@ -29,17 +29,6 @@ export interface Configuration {
       update?: boolean;
       list?: boolean;
     };
-    refunds?: {
-      create?: boolean;
-      read?: boolean;
-      list?: boolean;
-    };
-    subscriptions?: {
-      create?: boolean;
-      read?: boolean;
-      update?: boolean;
-      list?: boolean;
-    };
     // Add more resources as needed
   };
   context?: {

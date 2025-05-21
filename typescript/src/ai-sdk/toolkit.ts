@@ -52,14 +52,10 @@ class VisaAcceptanceAgentToolkit {
       return allowed;
     });
     
-    console.log('Filtered tools count:', filteredTools.length);
-    
     filteredTools.forEach((tool) => {
       this.tools[tool.method] = VisaAcceptanceTool(this.api, tool.method, tool.description, tool.parameters);
-      console.log(`Registered tool: ${tool.method}`);
     });
   }
-
 
   /**
    * Get all available tools

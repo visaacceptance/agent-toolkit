@@ -44,7 +44,7 @@ const visaAcceptanceAgentToolkit = new VisaAcceptanceAgentToolkit(
 
 async function aiGeneratedPaymentLink() {
   console.log("Attempting to generate a payment link...");
-  const userPrompt = `Create a payment link for a Ski Trip to Whistler, Canada for 2 adults and 2 children. The total amount is $5000.00. The payment link should be valid for 30 days.`;
+  const userPrompt = `Create a payment link for a Ski Trip to Whistler, Canada. The total amount is $1000.00. The payment link should be valid for 30 days.`;
   const result = await generateText({
     model: openai('gpt-4o'),
     tools: {

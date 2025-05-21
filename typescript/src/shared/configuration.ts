@@ -79,7 +79,7 @@ export function isToolAllowed(tool: Tool, config: Configuration): boolean {
 /**
  * Get Cybersource configuration
  */
-export function getCybersourceConfig() {
+export function getVisaAcceptanceConfig() {
 
   const config = {
     authenticationType: 'http_signature',
@@ -107,7 +107,7 @@ export function getCybersourceConfig() {
     
     logConfiguration: {
       enableLog: false,
-      logFileName: 'cybs',
+      logFileName: '',
       logDirectory:  './log',
       logFileMaxSize: '5242880',
       loggingLevel:  'info',
@@ -115,47 +115,9 @@ export function getCybersourceConfig() {
     }
   };
   
-  
   if (!config.merchantID) {
     console.warn('WARNING: merchantID is empty or undefined in getCybersourceConfig');
   }
   
   return config;
-}
-
-
-
-/**
- * Configuration interface for Cybersource
- */
-export interface CybersourceConfiguration {
-  authenticationType: string;
-  runEnvironment: string;
-  merchantID: string;
-  merchantKeyId: string;
-  merchantsecretKey: string;
-  keyAlias: string;
-  keyPass: string;
-  keyFileName: string;
-  keysDirectory: string;
-  useMetaKey: boolean;
-  portfolioID: string;
-  pemFileDirectory: string;
-  defaultDeveloperId: string;
-  logConfiguration: {
-    enableLog: boolean | string,
-    logFileName: string,
-    logDirectory: string,
-    logFileMaxSize: string,
-    loggingLevel: 'debug' | 'info' | 'warn' | 'error',
-    enableMasking: boolean,
-    isLogEnabled?: () => boolean,
-    getLogFileName?: () => string,
-    getLogDirectory?: () => string,
-    getLoggingLevel?: () => string,
-    isMaskingEnabled?: () => boolean,
-    isExternalLoggerSet?: () => boolean,
-    getMaxLogFiles?: () => number,
-    getDefaultLoggingProperties?: () => void
-  };
 }

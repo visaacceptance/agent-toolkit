@@ -1,7 +1,7 @@
 {
   "name": "@visaacceptance/mcp",
   "version": "0.1.0",
-  "description": "Visa Acceptance Agent Toolkit with MCP integration for refund functionality",
+  "description": "Visa Acceptance Agent Toolkit with MCP integration for payment services.",
   "type": "commonjs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -46,8 +46,7 @@
     "agent",
     "toolkit",
     "mcp",
-    "model-context-protocol",
-    "refund"
+    "model-context-protocol"
   ],
   "author": "Visa Acceptance",
   "license": "MIT",

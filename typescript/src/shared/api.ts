@@ -1,14 +1,10 @@
 import { VisaContext } from './types';
 import tools, { Tool } from './tools';
-import { getCybersourceConfig } from './configuration';
+import { getVisaAcceptanceConfig } from './configuration';
 const cybersourceRestApi = require('cybersource-rest-client');
 
 // TypeScript declaration for Node.js require function
 declare function require(id: string): any;
-
-// Import Node.js modules
-const crypto = require('crypto');
-const superagent = require('superagent');
 
 const TOOLKIT_HEADER = 'visa-acceptance-agent-toolkit-typescript';
 const MCP_HEADER = 'visa-acceptance-mcp';
@@ -40,7 +36,7 @@ class VisaAcceptanceAPI {
     this.tools = tools(this.context);
     
     // Get proper configuration and initialize the API client with it
-    const config = getCybersourceConfig();
+    const config = getVisaAcceptanceConfig();
 
     // Override config with context values if provided
     const configObj = {
