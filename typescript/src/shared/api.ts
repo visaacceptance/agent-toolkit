@@ -41,7 +41,7 @@ class VisaAcceptanceAPI {
     
     // Get proper configuration and initialize the API client with it
     const config = getCybersourceConfig();
-    
+
     // Override config with context values if provided
     const configObj = {
       authenticationType: config.authenticationType,
@@ -59,11 +59,10 @@ class VisaAcceptanceAPI {
       defaultDeveloperId: config.defaultDeveloperId,
       logConfiguration: config.logConfiguration
     };
-    
+
     // Initialize the API client and set the configuration
     const apiClient = new cybersourceRestApi.ApiClient();
     apiClient.setConfiguration(configObj);
-
     this._apiClient = {
       visaApiClient: apiClient,
       configuration: configObj

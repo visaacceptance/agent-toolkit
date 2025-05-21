@@ -2,21 +2,26 @@ import { z } from 'zod';
 import { VisaContext } from './types';
 
 
-// Import invoice tools
 import createInvoiceToolModule from './invoices/createInvoice';
-import listInvoicesToolModule from './invoices/listInvoices';
-import getInvoiceToolModule from './invoices/getInvoice';
 import updateInvoiceToolModule from './invoices/updateInvoice';
+import getInvoiceToolModule from './invoices/getInvoice';
+import listInvoicesToolModule from './invoices/listInvoices';
+import sendInvoiceToolModule from './invoices/sendInvoice';
+import cancelInvoiceToolModule from './invoices/cancelInvoice';
+import createPaymentLinkToolModule from './paymentLinks/createPaymentLink';
+import updatePaymentLinkToolModule from './paymentLinks/updatePaymentLink';
+import getPaymentLinkToolModule from './paymentLinks/getPaymentLink';
+import listPaymentLinkToolModule from './paymentLinks/listPaymentLinks';
 
 /**
  * Tool interface defining the structure of a tool
  */
 export type Tool = {
-  method: string;                // Unique identifier for the tool
-  name: string;                  // Display name
-  description: string;           // Description for AI consumption
+  method: string;
+  name: string;
+  description: string;
   parameters: z.ZodObject<any, any, any, any>;
-  actions: {                     // Permission structure
+  actions: {
     [resource: string]: {
       [action: string]: boolean;
     }
@@ -30,13 +35,20 @@ export type Tool = {
  */
 export function tools(context: VisaContext): Tool[] {
   return [
-    // Use the new modular invoice tools
     createInvoiceToolModule(context),
-    listInvoicesToolModule(context),
+    updateInvoiceToolModule(context),
     getInvoiceToolModule(context),
-    updateInvoiceToolModule(context)
+    listInvoicesToolModule(context),
+    sendInvoiceToolModule(context),
+    cancelInvoiceToolModule(context),
+    createPaymentLinkToolModule(context),
+    updatePaymentLinkToolModule(context),
+    getPaymentLinkToolModule(context),
+    listPaymentLinkToolModule(context)
   ];
 }
 
-// Also export as default for backward compatibility
+/**
+ * Default export for backward compatibility
+ */
 export default tools;

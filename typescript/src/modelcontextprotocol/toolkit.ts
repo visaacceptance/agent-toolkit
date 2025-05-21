@@ -39,8 +39,6 @@ class VisaAcceptanceAgentToolkit extends McpServer {
         merchantKeyId: options.apiKeyId || process.env.VISA_ACCEPTANCE_API_KEY_ID
       };
   
-      // Initialize API client with credentials
-      // Convert credentials to match VisaContext type
       const visaContext: VisaContext = {
         merchantId: this.credentials.merchantId || '',
         apiKeyId: this.credentials.merchantKeyId || '',

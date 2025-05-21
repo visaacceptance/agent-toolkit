@@ -3,10 +3,9 @@ import VisaAcceptanceAPI from '../shared/api';
 import { VisaContext } from '../shared/types';
 import VisaAcceptanceTool from './tool';
 import { z } from 'zod';
-import createInvoiceToolModule from '../shared/invoices/createInvoice';
 import {isToolAllowed} from '../shared/configuration';
 import {Configuration} from '../shared/types';
-
+import tools from '../shared/tools';
 
 class VisaAcceptanceAgentToolkit {
   private api: VisaAcceptanceAPI;
@@ -14,16 +13,17 @@ class VisaAcceptanceAgentToolkit {
   private toolMap: Map<string, Tool> = new Map();
   private configuration: Configuration;
   private credentials: {
-    secretKey?: string;
+    
     merchantId?: string;
     merchantKeyId?: string;
+    secretKey?: string;
   };
 
   /**
    * Creates a new Visa Acceptance Agent Toolkit
    * @param options Configuration options matching Stripe's pattern
    */
-  constructor( secretKeyTool: string | undefined, merchantIdTool: string | undefined, merchantKeyIdTool : string | undefined, configuration: Configuration = {}) {
+  constructor( merchantIdTool: string | undefined, merchantKeyIdTool : string | undefined, secretKeyTool: string | undefined, configuration: Configuration = {}) {
     this.credentials = {
       secretKey: secretKeyTool || process.env.VISA_ACCEPTANCE_SECRET_KEY,
       merchantId: merchantIdTool || process.env.VISA_ACCEPTANCE_MERCHANT_ID,
@@ -41,28 +41,25 @@ class VisaAcceptanceAgentToolkit {
     this.api = new VisaAcceptanceAPI(visaContext);
     this.tools = {};
     // Set configuration with defaults
-    this.configuration = configuration || {
-      actions: {
-        invoices: {
-          create: true
-        }
-      }
-    };
+    this.configuration = configuration;
     
-    // Initialize tools based on configuration
-    this.initializeTools(visaContext);
+    // Log all available tools before filtering
+    const allTools = tools(visaContext);
+
+    // Log each tool filtering decision
+    const filteredTools = allTools.filter((tool) => {
+      const allowed = isToolAllowed(tool, configuration);
+      return allowed;
+    });
+    
+    console.log('Filtered tools count:', filteredTools.length);
+    
+    filteredTools.forEach((tool) => {
+      this.tools[tool.method] = VisaAcceptanceTool(this.api, tool.method, tool.description, tool.parameters);
+      console.log(`Registered tool: ${tool.method}`);
+    });
   }
 
-  /**
-   * Initialize all available Visa Acceptance tools based on configuration
-   */
-  private initializeTools(visaContext: VisaContext): void {
-    // Add create invoice tool if enabled in configuration
-    if (this.configuration.actions?.invoices?.create !== false) {
-      const createInvoiceTool = createInvoiceToolModule(visaContext);
-    }
-
-  }
 
   /**
    * Get all available tools

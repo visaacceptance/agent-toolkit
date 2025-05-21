@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { Tool } from '../tools';
 import { VisaContext } from '../types';
 import { Context } from '../configuration';
+import { maskInvoicesCustomerInfo } from '../utils/masking';
 const cybersourceRestApi = require('cybersource-rest-client');
 
 export const listInvoicesParameters = (
@@ -24,11 +25,8 @@ export const listInvoices = async (
   params: z.infer<ReturnType<typeof listInvoicesParameters>>
 ) => {
   try {
-
     // Create the InvoicesApi instance with the client configuration
     const invoiceApiInstance = new cybersourceRestApi.InvoicesApi(visaClient.configuration, visaClient.visaApiClient);
-    
-
     const result = await new Promise((resolve, reject) => {
       invoiceApiInstance.getAllInvoices(
         params.offset,
@@ -44,14 +42,32 @@ export const listInvoices = async (
       );
     });
     
-    return result;
+    // Apply PII masking to customer information in all invoices before returning the result
+    // The result may contain an array of invoices or a single invoice with embedded invoices
+    let maskedResult = result;
+    
+    // Use type assertion to handle the dynamic structure of the result
+    const typedResult = result as any;
+    
+    if (typedResult && typedResult.invoices && Array.isArray(typedResult.invoices)) {
+      // If result contains an array of invoices, mask each one
+      maskedResult = {
+        ...typedResult,
+        invoices: maskInvoicesCustomerInfo(typedResult.invoices)
+      };
+    } else {
+      // If the structure is different, apply general masking
+      maskedResult = maskInvoicesCustomerInfo([typedResult])[0];
+    }
+    
+    return maskedResult;
 
   } catch (error) {
     const errorMessage = error instanceof Error ?
       `Failed to list invoices: ${error.message}` :
       'Failed to list invoices: Unknown error';
     
-    console.error('Error in listInvoices tool:', errorMessage);
+    console.error('Error in listInvoices tool:', error);
     
     // Return error diagnostic information
     return {
@@ -68,7 +84,7 @@ const tool = (context: VisaContext): Tool => ({
   parameters: listInvoicesParameters(context),
   actions: {
     invoices: {
-      list: true,
+      read: true,
     },
   },
   execute: listInvoices,

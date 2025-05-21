@@ -1,20 +1,22 @@
 {
-  "name": "cybersource-agent-toolkit-ai-sdk-example",
+  "name": "visa-acceptance-agent-toolkit-ai-sdk-example",
   "version": "0.1.0",
-  "description": "Example using CybersourceAgentToolkit with AI SDK",
-  "main": "index.js",
+  "description": "Example using VisaAcceptanceAgentToolkit with AI SDK",
   "scripts": {
     "start": "ts-node index.ts"
   },
+  "license": "MIT",
   "dependencies": {
     "@ai-sdk/openai": "^1.3.21",
     "ai": "^4.3.13",
-    "axios": "^1.9.0",
-    "cybersource-rest-client": "^0.0.66",
+    "colors": "^1.4.0",
+    "cybersource-rest-client": "^0.0.67",
     "dotenv": "^16.5.0",
-    "openai": "^4.28.0",
     "superagent": "^10.2.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.4"
   }
 }

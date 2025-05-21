@@ -11,7 +11,6 @@ import { Context } from './configuration';
 import tools from './tools';
 import { Tool } from './tools';
 import VisaAcceptanceAPI from './api';
-// Parameter types still needed for type checking
 
 
 /**
@@ -59,7 +58,11 @@ export interface VisaAcceptanceAgentToolkitOptions {
         create?: boolean;
         read?: boolean;
         update?: boolean;
-        list?: boolean;
+      };
+      paymentLinks?: {
+        create?: boolean;
+        read?: boolean;
+        update?: boolean;
       };
     };
   };
@@ -75,7 +78,6 @@ export class VisaAcceptanceAgentToolkit {
     mode: 'modelcontextprotocol'
   };
 
-  // Visa Acceptance context
   private visaContext: VisaContext;
 
   /**
@@ -85,22 +87,17 @@ export class VisaAcceptanceAgentToolkit {
   constructor(options: VisaAcceptanceAgentToolkitOptions = {}) {
     dotenv.config();
 
-    // Initialize with options or environment variables
     this.visaContext = {
-      // Check for both new simplified names AND old names for backward compatibility
-      // New simplified names take precedence if both are defined
       merchantId: options.merchantId || process.env.MERCHANT_ID || process.env.VISA_ACCEPTANCE_MERCHANT_ID || '',
       apiKeyId: options.apiKeyId || process.env.API_KEY_ID || process.env.VISA_ACCEPTANCE_API_KEY_ID || '',
       secretKey: options.secretKey || process.env.SECRET_KEY || process.env.VISA_ACCEPTANCE_SECRET_KEY || '',
       environment: options.environment || 'SANDBOX'
     };
 
-    // Validate required credentials
     if ((!this.visaContext.merchantId || !this.visaContext.apiKeyId || !this.visaContext.secretKey)) {
       throw new Error('Missing Visa Acceptance API credentials. Please provide them in options or set environment variables.');
     }
 
-    // Instantiate the MCP Server
     this.server = new Server(
       {
         name: 'visa-acceptance',
@@ -131,48 +128,35 @@ export class VisaAcceptanceAgentToolkit {
    * Set up tool handlers for the MCP server
    */
   private setupToolHandlers(): void {
-    // Get the tools from the TypeScript project
-    // Create a VisaContext from our context
     const visaContext: VisaContext = {
       merchantId: process.env.VISA_ACCEPTANCE_MERCHANT_ID || '',
       apiKeyId: process.env.VISA_ACCEPTANCE_API_KEY_ID || '',
       secretKey: process.env.VISA_ACCEPTANCE_SECRET_KEY || '',
       environment: 'SANDBOX'
-      // mode is not part of VisaContext type
     };
     const toolDefinitions = tools(visaContext);
     
-    // Define mapping between tool methods and MCP-expected names
     const methodToMcpName: Record<string, string> = {
-      'create_invoice': 'invoices.create',
-      'list_invoices': 'invoices.list',
-      'get_invoice': 'invoices.get',
-      'update_invoice': 'invoices.update'
     };
     
-    // Debug: Print out the available tools
     console.error('Available tools:');
     toolDefinitions.forEach((tool: Tool) => {
       const mcpName = methodToMcpName[tool.method] || `custom.${tool.method}`;
       console.error(`- ${tool.name} (${tool.method} → ${mcpName}): ${tool.description.substring(0, 50)}...`);
     });
     
-    // Provide the list of tools
+    /**
+     * Handle tool listing requests - converts Zod schemas to JSON Schema format
+     */
     this.server.setRequestHandler(ListToolsRequestSchema, async () => {
       const toolsList = toolDefinitions.map((tool: Tool) => {
-        // Use the MCP-expected name format if available, otherwise format as 'custom.{method}'
         const name = methodToMcpName[tool.method] || `custom.${tool.method}`;
-        
-        // Convert Zod schema to JSON Schema format
         const properties: Record<string, any> = {};
         const required: string[] = [];
         
-        // Process each field in the Zod schema
         Object.entries(tool.parameters.shape).forEach(([key, field]: [string, any]) => {
-          // Skip internal Zod properties
           if (key.startsWith('_')) return;
           
-          // Get the field type
           let type = 'string';
           if (field._def.typeName === 'ZodNumber') {
             type = 'number';
@@ -184,21 +168,17 @@ export class VisaAcceptanceAgentToolkit {
             type = 'object';
           }
           
-          // Get description if available
           const description = field._def.description || '';
           
-          // Check if field is required
           if (!field.isOptional()) {
             required.push(key);
           }
           
-          // Add to properties
           properties[key] = {
             type,
             description
           };
           
-          // Handle nested objects
           if (field._def.typeName === 'ZodObject' && field.shape) {
             properties[key].properties = {};
             const nestedRequired: string[] = [];
@@ -230,7 +210,6 @@ export class VisaAcceptanceAgentToolkit {
             }
           }
           
-          // Handle arrays
           if (field._def.typeName === 'ZodArray' && field._def.type) {
             properties[key].items = {
               type: 'object',
@@ -269,7 +248,6 @@ export class VisaAcceptanceAgentToolkit {
           }
         });
         
-        // Create the JSON Schema
         const inputSchema = {
           type: 'object',
           properties: properties,
@@ -287,36 +265,31 @@ export class VisaAcceptanceAgentToolkit {
       return { tools: toolsList };
     });
 
-    // Define reverse mapping from MCP names to tool methods
     const mcpNameToMethod: Record<string, string> = {};
     Object.entries(methodToMcpName).forEach(([method, mcpName]) => {
       mcpNameToMethod[mcpName] = method;
     });
 
-    // Tool request handler
+    /**
+     * Handle tool execution requests
+     */
     this.server.setRequestHandler(CallToolRequestSchema, async (request: any): Promise<any> => {
       const mcpToolName = request.params.name;
       const args = request.params.arguments;
       
-      // Map from MCP name format to our internal method name
       let toolName: string;
       if (mcpNameToMethod[mcpToolName]) {
-        // Use the mapped method name if available
         toolName = mcpNameToMethod[mcpToolName];
       } else if (mcpToolName.startsWith('custom.')) {
-        // Extract the method name from custom.{method} format
-        toolName = mcpToolName.substring(7); // Remove 'custom.' prefix
+        toolName = mcpToolName.substring(7);
       } else {
-        // Fallback to using the MCP name directly
         toolName = mcpToolName;
       }
       
       console.error(`Tool requested: ${mcpToolName} → ${toolName}`);
       console.error(`Arguments: ${JSON.stringify(args, null, 2)}`);
 
-      // Use real Cybersource API client calls
       try {
-        // Find the appropriate tool from toolDefinitions based on the tool name
         const tool = toolDefinitions.find((t: Tool) => t.method === toolName);
         
         if (!tool) {
@@ -325,10 +298,7 @@ export class VisaAcceptanceAgentToolkit {
         
         console.error(`Executing tool: ${tool.name} (${tool.method})`);
         
-        // Create the Visa API client
         const visaClient = new VisaAcceptanceAPI(this.visaContext)._apiClient;
-        
-        // Call the tool's execute method with the Visa client, context, and arguments
         const result = await tool.execute(visaClient, this.visaContext, args);
 
         return this.formatResponse({ success: true, result });

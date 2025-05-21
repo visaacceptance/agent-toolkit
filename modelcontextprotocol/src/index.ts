@@ -3,14 +3,14 @@
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import dotenv from 'dotenv';
 import { green, yellow, red } from 'colors';
-// Import the toolkit from the package
 import { VisaAcceptanceAgentToolkit } from '@visaacceptance/agent-toolkit';
 
 
-
-// Load environment variables
 dotenv.config();
 
+/**
+ * Main configuration type for the Visa Acceptance MCP server
+ */
 type ToolkitConfig = {
   actions: {
     [product: string]: {[action: string]: boolean};
@@ -21,18 +21,17 @@ type ToolkitConfig = {
   };
 };
 
-// Define accepted command-line arguments
 const ACCEPTED_ARGS = ['merchant-id', 'api-key-id', 'secret-key', 'environment', 'tools'];
 
-// Define accepted tools
 const ACCEPTED_TOOLS = [
-  'create_invoice',
-  'list_invoices',
-  'get_invoice',
-  'update_invoice'
+  'invoices.create',
+  'invoices.read',
+  'invoices.update',
+  'paymentLinks.create',
+  'paymentLinks.update',
+  'paymentLinks.read'
 ];
 
-// Define options type
 type Options = {
   merchantId?: string;
   apiKeyId?: string;
@@ -89,13 +88,8 @@ function handleError(error: any) {
  */
 export async function main(): Promise<void> {
   try {
-    // Parse command-line arguments
     const options = parseArgs(process.argv.slice(2));
 
-    // Create the configuration
-    // Check for tools in command-line args first, then environment variables
-    // Check for both new simplified names AND old names for backward compatibility
-    // New simplified names take precedence if both are defined
     const toolsFromEnv = process.env.ACCEPTANCE_TOOLS ?
       process.env.ACCEPTANCE_TOOLS.split(',') :
       process.env.VISA_ACCEPTANCE_TOOLS ?
@@ -103,46 +97,28 @@ export async function main(): Promise<void> {
         undefined;
     
     const selectedTools = options.tools || toolsFromEnv;
-    // Initialize with non-null values to avoid TypeScript errors
     const toolkitConfig: ToolkitConfig = {
       actions: {
         invoices: {}
       }
     };
 
-    // Ensure selectedTools is defined before using it
     if (!selectedTools) {
       throw new Error('No tools specified. Please provide tools via --tools argument or ACCEPTANCE_TOOLS/VISA_ACCEPTANCE_TOOLS environment variable.');
     }
 
     if (selectedTools.includes('all')) {
-      // Enable all tools
-      toolkitConfig.actions = {
-        invoices: {
-          create: true,
-          list: true,
-          get: true,
-          update: true
-        }
-      };
+      ACCEPTED_TOOLS.forEach((tool) => {
+        const [product, action] = tool.split('.');
+        toolkitConfig.actions[product] = {
+          ...toolkitConfig.actions[product],
+          [action]: true,
+        };
+      });
     } else {
       selectedTools.forEach((tool: string) => {
-        // Ensure invoices object exists
-        if (!toolkitConfig.actions) toolkitConfig.actions = {};
-        if (!toolkitConfig.actions.invoices) toolkitConfig.actions.invoices = {};
-        
-        // Map tool names to product/action pairs
-        if (tool === 'create_invoice') {
-          toolkitConfig.actions.invoices.create = true;
-        } else if (tool === 'list_invoices') {
-          toolkitConfig.actions.invoices.list = true;
-        } else if (tool === 'get_invoice') {
-          toolkitConfig.actions.invoices.get = true;
-        } else if (tool === 'update_invoice') {
-          toolkitConfig.actions.invoices.update = true;
-        } else {
-          console.error(`Warning: Unknown tool: ${tool}`);
-        }
+        const [product, action] = tool.split('.');        
+        toolkitConfig.actions[product] = {[action]: true};
       });
     }
 
@@ -150,10 +126,7 @@ export async function main(): Promise<void> {
       mode: 'modelcontextprotocol'
     };
 
-    // Initialize the toolkit with options
     const mcpServer = new VisaAcceptanceAgentToolkit({
-      // Check for both new simplified names AND old names for backward compatibility
-      // New simplified names take precedence if both are defined
       merchantId: options.merchantId || process.env.MERCHANT_ID || process.env.VISA_ACCEPTANCE_MERCHANT_ID,
       apiKeyId: options.apiKeyId || process.env.API_KEY_ID || process.env.VISA_ACCEPTANCE_API_KEY_ID,
       secretKey: options.secretKey || process.env.SECRET_KEY || process.env.VISA_ACCEPTANCE_SECRET_KEY,
@@ -161,25 +134,12 @@ export async function main(): Promise<void> {
       configuration: toolkitConfig
     });
 
-    // Create a StdioServerTransport and connect the server
     console.error('Starting MCP server...');
     const serverTransport = new StdioServerTransport();
     await mcpServer.connect(serverTransport);
     console.error('Connected to stdio transport');
 
-    // We use console.error instead of console.log since console.log will output to stdio
     console.error(green('✅ Visa Acceptance MCP server running on stdio'));
-    
-    // Safely display registered tools
-    const registeredTools: string[] = [];
-    if (toolkitConfig.actions && toolkitConfig.actions.invoices) {
-      if (toolkitConfig.actions.invoices.create) registeredTools.push('invoices.create');
-      if (toolkitConfig.actions.invoices.list) registeredTools.push('invoices.list');
-      if (toolkitConfig.actions.invoices.get) registeredTools.push('invoices.get');
-      if (toolkitConfig.actions.invoices.update) registeredTools.push('invoices.update');
-    }
-    
-    console.error(green(`✅ Registered tools: ${registeredTools.join(', ')}`));
 
     if (options.environment === 'SANDBOX' || process.env.VISA_ACCEPTANCE_ENVIRONMENT === 'SANDBOX') {
       console.error(yellow(`⚠️ Running in SANDBOX ENVIRONMENT`));
@@ -191,7 +151,6 @@ export async function main(): Promise<void> {
   }
 }
 
-// If invoked directly, start the server
 if (require.main === module) {
   main().catch((error) => {
     handleError(error);

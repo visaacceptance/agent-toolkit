@@ -34,7 +34,7 @@
     "@modelcontextprotocol/sdk": "^1.11.0",
     "ai": "^4.3.11",
     "axios": "^1.9.0",
-    "cybersource-rest-client": "^0.0.66",
+    "cybersource-rest-client": "^0.0.67",
     "dotenv": "^16.5.0",
     "openai": "^4.96.2",
     "superagent": "^10.2.0",

@@ -5,48 +5,50 @@ import { Context } from '../configuration';
 import { maskInvoiceCustomerInfo } from '../utils/masking';
 const cybersourceRestApi = require('cybersource-rest-client');
 
-export const getInvoiceParameters = (
+export const sendInvoiceParameters = (
   context: VisaContext = {} as VisaContext
 ): z.AnyZodObject => {
   return z.object({
-    id: z.string().describe('Invoice ID (required)')
+    invoice_id: z.string().describe('Invoice ID (required)')
   });
 };
 
-export const getInvoicePrompt = (context: VisaContext = {} as VisaContext) => `
-This tool will get a specific invoice from Visa Acceptance.
+export const sendInvoicePrompt = (context: VisaContext = {} as VisaContext) => `
+This tool will send an invoice to the customer from Visa Acceptance.
 `;
 
-export const getInvoice = async (
+export const sendInvoice = async (
   visaClient: any,
   context: VisaContext,
-  params: z.infer<ReturnType<typeof getInvoiceParameters>>
+  params: z.infer<ReturnType<typeof sendInvoiceParameters>>
 ) => {
   try {
-    
     // Create the InvoicesApi instance with the client configuration
     const invoiceApiInstance = new cybersourceRestApi.InvoicesApi(visaClient.configuration, visaClient.visaApiClient);
     
-    // Call the Cybersource API to get an invoice by ID
+    // Call the Cybersource API to send an invoice
     const result = await new Promise((resolve, reject) => {
-      invoiceApiInstance.getInvoice(params.id, (error: any, data: any) => {
+      invoiceApiInstance.performSendAction(params.invoice_id, (error: any, data: any, response: any) => {
         if (error) {
+          console.error('Error from Cybersource API:', error);
           reject(error);
         } else {
-          resolve(data);
+          console.error('Response from Cybersource API:', JSON.stringify(data, null, 2));
+          resolve({
+            data,
+            status: response['status']
+          });
         }
       });
     });
-    
-    // Apply PII masking to customer information before returning the result
     const maskedResult = maskInvoiceCustomerInfo(result);
-    
     return maskedResult;
   } catch (error) {
     const errorMessage = error instanceof Error ?
-      `Failed to get invoice: ${error.message}` :
-      'Failed to get invoice: Unknown error';
-
+      `Failed to send invoice: ${error.message}` :
+      'Failed to send invoice: Unknown error';
+    
+    console.error('Error in sendInvoice tool:', errorMessage);
     
     // Return error diagnostic information
     return {
@@ -57,16 +59,16 @@ export const getInvoice = async (
 };
 
 const tool = (context: VisaContext): Tool => ({
-  method: 'get_invoice',
-  name: 'Get Invoice',
-  description: getInvoicePrompt(context),
-  parameters: getInvoiceParameters(context),
+  method: 'send_invoice',
+  name: 'Send Invoice',
+  description: sendInvoicePrompt(context),
+  parameters: sendInvoiceParameters(context),
   actions: {
     invoices: {
-      read: true,
+      update: true,
     },
   },
-  execute: getInvoice,
+  execute: sendInvoice,
 });
 
 export default tool;

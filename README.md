@@ -123,14 +123,6 @@ main().catch((error) => {
 });
 ```
 
-## Supported API methods
-
-- [Create an invoice](https://developer.visa-acceptance.com/api/invoices/create)
-- [Update an invoice](https://developer.visa-acceptance.com/api/invoices/update)
-- [List all invoices](https://developer.visa-acceptance.com/api/invoices/list)
-- [Get invoice details](https://developer.visa-acceptance.com/api/invoices/get)
-- [Process a refund](https://developer.visa-acceptance.com/api/refunds/process)
-
 ## Authentication
 
 The Visa Acceptance Agent Toolkit uses Visa Acceptance API credentials which include:
