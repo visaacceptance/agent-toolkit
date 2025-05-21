@@ -184,3 +184,5 @@ venv.bak/
 .venv/
 
 .DS_Store
+modelcontextprotocol/package-lock.json
+typescript/package-lock.json
