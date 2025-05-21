@@ -183,3 +183,4 @@ env.bak/
 venv.bak/
 .venv/
 
+.DS_Store
