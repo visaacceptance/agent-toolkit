@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "cybersource-rest-client": "^0.0.67",
-    "dotenv": "^16.5.0"
-  }
-}

@@ -1,15 +1,12 @@
 # Visa Acceptance Agent Toolkit
 
-The Visa Acceptance Agent Toolkit enables popular agent frameworks including OpenAI's Agent SDK, Vercel's AI SDK, and Model Context Protocol (MCP) to integrate with Visa Acceptance APIs through function calling. The library provides tools for invoice management and payment operations specifically for Visa Acceptance services, with support for customer information and enhanced invoice parameters.
-
-Included below are basic instructions, but refer to the [TypeScript](/typescript) package for more information.
+The Visa Acceptance Agent Toolkit seamlessly integrates with popular agent frameworks, including OpenAI's Agent SDK, Vercel's AI SDK, and the Model Context Protocol (MCP), for Visa Acceptance APIs. It offers a specialized set of tools designed to help you manage invoices, create payment links, and perform other Visa Acceptance-related operations.
 
 ## TypeScript
 
 ### Installation
 
-You don't need this source code unless you want to modify the package. If you just
-want to use the package run:
+If you simply want to use the toolkit without modifying its source code, install it via:
 
 ```sh
 npm install @visaacceptance/agent-toolkit
@@ -21,12 +18,12 @@ npm install @visaacceptance/agent-toolkit
 
 ### Usage
 
-The library needs to be configured with your Visa Acceptance account credentials which are available in your Visa Acceptance Dashboard. It supports both simplified environment variable names (MERCHANT_ID, API_KEY_ID, SECRET_KEY) and legacy names (VISA_ACCEPTANCE_*) for backward compatibility.
+Configure the toolkit with your Visa Acceptance account credentials. These credentials can be set using environment variables (`MERCHANT_ID`, `API_KEY_ID`, `SECRET_KEY`) or legacy naming conventions (`VISA_ACCEPTANCE_MERCHANT_ID`, `VISA_ACCEPTANCE_API_KEY_ID`, `VISA_ACCEPTANCE_SECRET_KEY`).
 
 ```typescript
 import { VisaAcceptanceAgentToolkit } from "@visaacceptance/agent-toolkit/ai-sdk";
 
-const visaAcceptanceAgentToolkit = new VisaAcceptanceAgentToolkit({
+const toolkit = new VisaAcceptanceAgentToolkit({
   merchantId: process.env.MERCHANT_ID!,
   apiKeyId: process.env.API_KEY_ID!,
   secretKey: process.env.SECRET_KEY!,
@@ -37,35 +34,82 @@ const visaAcceptanceAgentToolkit = new VisaAcceptanceAgentToolkit({
         update: true,
         list: true,
         get: true,
+        send: true,
+      },
+      paymentLinks: {
+        create: true,
+        update: true,
+        list: true,
+        get: true,
       },
     },
   },
 });
 ```
 
-The toolkit works with Vercel's AI SDK and can be passed as a list of tools. For example:
+### Integrating with OpenAI's Agent SDK
+
+Below is a minimal sample of how you can integrate this toolkit with OpenAI's Agent SDK:
 
 ```typescript
-import { AI } from "@vercel/ai";
+import { Agent } from "@openai/agent-sdk";
+import { VisaAcceptanceAgentToolkit } from "@visaacceptance/agent-toolkit/ai-sdk";
 
-const tools = visaAcceptanceAgentToolkit.getTools();
-
-const ai = new AI({
-  tools,
+const toolkit = new VisaAcceptanceAgentToolkit({
+  merchantId: process.env.MERCHANT_ID!,
+  apiKeyId: process.env.API_KEY_ID!,
+  secretKey: process.env.SECRET_KEY!,
 });
 
-// Use the tools with Vercel AI SDK
-const response = await ai.run({
-  messages: [{ role: 'user', content: 'Create an invoice for $100' }],
+const agent = new Agent({
+  name: "Visa Acceptance Agent",
+  instructions: "You can manage Visa Acceptance invoices and payment links.",
+  tools: toolkit.getTools(),
+});
+
+// Example usage:
+const result = await agent.run({
+  messages: [{ role: "user", content: "Create a $100 invoice" }],
 });
 ```
 
-#### Context
+### Integrating with Vercel's AI SDK
 
-In some cases you will want to provide values that serve as defaults when making requests. Currently, the environment context value enables you to switch between test and production environments.
+To use this toolkit with Vercel's AI SDK:
 
 ```typescript
-const visaAcceptanceAgentToolkit = new VisaAcceptanceAgentToolkit({
+import { AI } from "@vercel/ai";
+import { VisaAcceptanceAgentToolkit } from "@visaacceptance/agent-toolkit/ai-sdk";
+
+const toolkit = new VisaAcceptanceAgentToolkit({
+  merchantId: process.env.MERCHANT_ID!,
+  apiKeyId: process.env.API_KEY_ID!,
+  secretKey: process.env.SECRET_KEY!,
+  configuration: {
+    actions: {
+      invoices: {
+        create: true,
+      }
+    },
+  },
+});
+
+const ai = new AI({
+  tools: toolkit.getTools(),
+});
+
+// Sample usage:
+const response = await ai.run({
+  messages: [{ role: "user", content: "Please create an invoice for $200" }],
+});
+```
+
+### Context
+
+You can set default behaviors or environments via the `configuration.context` block. For example, enabling test environments:
+
+```typescript
+const toolkit = new VisaAcceptanceAgentToolkit({
   merchantId: process.env.MERCHANT_ID!,
   apiKeyId: process.env.API_KEY_ID!,
   secretKey: process.env.SECRET_KEY!,
@@ -79,17 +123,13 @@ const visaAcceptanceAgentToolkit = new VisaAcceptanceAgentToolkit({
 
 ## Model Context Protocol
 
-The Visa Acceptance Agent Toolkit also supports the [Model Context Protocol (MCP)](https://modelcontextprotocol.com/).
-
-To run the Visa Acceptance MCP server using npx, use the following command:
+The [Model Context Protocol (MCP)](https://modelcontextprotocol.com/) is also supported. You can run a Visa Acceptance MCP server with:
 
 ```bash
 npx -y @visaacceptance/mcp --tools=all --merchant-id=YOUR_MERCHANT_ID --api-key-id=YOUR_API_KEY_ID --secret-key=YOUR_SECRET_KEY
 ```
 
-Replace the credential placeholders with your actual Visa Acceptance credentials. Or, you could set these values in your environment variables.
-
-Alternatively, you can set up your own MCP server. For example:
+Or use your own MCP server configuration like so:
 
 ```typescript
 import { VisaAcceptanceAgentToolkit } from "@visaacceptance/agent-toolkit/modelcontextprotocol";
@@ -102,10 +142,10 @@ const server = new VisaAcceptanceAgentToolkit({
   configuration: {
     actions: {
       invoices: {
-        create: true,
-        update: true,
-        list: true,
-        get: true,
+        create: true
+      },
+      paymentLinks: {
+        create: true
       },
     },
   },
@@ -123,15 +163,18 @@ main().catch((error) => {
 });
 ```
 
-## Authentication
+## Supported API Methods
 
-The Visa Acceptance Agent Toolkit uses Visa Acceptance API credentials which include:
-- Merchant ID
-- API Key ID
-- Secret Key
+The toolkit currently provides the following Visa Acceptance operations:
 
-These can be obtained from your Visa Acceptance account dashboard. The toolkit supports both simplified environment variable names (MERCHANT_ID, API_KEY_ID, SECRET_KEY) and legacy names (VISA_ACCEPTANCE_MERCHANT_ID, VISA_ACCEPTANCE_API_KEY_ID, VISA_ACCEPTANCE_SECRET_KEY) for backward compatibility.
+- **Invoices**  
 
+
+- **Payment Links**  
+
+
+## DISCLAIMER
+AI-generated content may be inaccurate or incomplete. Users are fully responsible for verifying any information before relying on it, especially for financial decisions. Visa Acceptance is not liable for any usage, decisions, or damages resulting from AI outputs or this toolkit.
 
 ## License
 
