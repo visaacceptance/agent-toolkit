@@ -7,7 +7,7 @@ const cybersourceRestApi = require('cybersource-rest-client');
 
 export const createInvoiceParameters = (
   context: VisaContext = {} as VisaContext
-): z.AnyZodObject => {
+) => {
   return z.object({
     invoice_number: z.string().describe('Unique invoice number (letters & numbers only, <20 chars)'),
     totalAmount: z.string().describe('Invoice total amount e.g. "100.00"'),
