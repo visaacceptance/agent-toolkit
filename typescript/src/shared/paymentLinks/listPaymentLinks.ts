@@ -7,7 +7,7 @@ const cybersourceRestApi = require('cybersource-rest-client');
 
 export const listPaymentLinksParameters = (
   context: VisaContext = {} as VisaContext
-): z.AnyZodObject => {
+) => {
   return z.object({
     offset: z.number().describe('Pagination offset (required)'),
     limit: z.number().describe('Pagination limit (required)'),

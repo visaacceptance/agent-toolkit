@@ -7,7 +7,7 @@ const cybersourceRestApi = require('cybersource-rest-client');
 
 export const getPaymentLinkParameters = (
   context: VisaContext = {} as VisaContext
-): z.AnyZodObject => {
+) => {
   return z.object({
     id: z.string().describe('Payment link ID (required)')
   });

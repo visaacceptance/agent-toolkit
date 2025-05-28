@@ -18,7 +18,7 @@ interface LineItem {
 
 export const updatePaymentLinkParameters = (
   context: VisaContext = {} as VisaContext
-): z.AnyZodObject => {
+) => {
   return z.object({
     id: z.string().describe('Payment link ID (required)'),
     linkType: z.string().optional().describe('Type of payment link (PURCHASE OR DONATION)'),

@@ -6,7 +6,7 @@ const cybersourceRestApi = require('cybersource-rest-client');
 import { maskInvoiceCustomerInfo } from '../utils/masking';
 export const cancelInvoiceParameters = (
   context: VisaContext = {} as VisaContext
-): z.AnyZodObject => {
+) => {
   return z.object({
     invoice_id: z.string().describe('Invoice ID (required)')
   });

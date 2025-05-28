@@ -7,7 +7,7 @@ const cybersourceRestApi = require('cybersource-rest-client');
 
 export const getInvoiceParameters = (
   context: VisaContext = {} as VisaContext
-): z.AnyZodObject => {
+) => {
   return z.object({
     id: z.string().describe('Invoice ID (required)')
   });
