@@ -41,8 +41,8 @@ export const createInvoice = async (
     const requestObj = {
       merchantId: context.merchantId, 
       customerInformation: {
-        name: params.customer_name || (params.customerInformation?.name), 
-        email: params.customer_email || (params.customerInformation?.email) 
+        name: params.customer_name || (params?.customer_name), 
+        email: params.customer_email || (params?.customer_email) 
       },
       orderInformation: {
         amountDetails: {
