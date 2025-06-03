@@ -132,7 +132,7 @@ export class VisaAcceptanceAgentToolkit {
       merchantId: process.env.VISA_ACCEPTANCE_MERCHANT_ID || '',
       apiKeyId: process.env.VISA_ACCEPTANCE_API_KEY_ID || '',
       secretKey: process.env.VISA_ACCEPTANCE_SECRET_KEY || '',
-      environment: 'SANDBOX'
+      environment: process.env.VISA_ACCEPTANCE_ENVIRONMENT || 'SANDBOX'
     };
     const toolDefinitions = tools(visaContext);
     
@@ -285,19 +285,13 @@ export class VisaAcceptanceAgentToolkit {
       } else {
         toolName = mcpToolName;
       }
-      
-      console.error(`Tool requested: ${mcpToolName} → ${toolName}`);
-      console.error(`Arguments: ${JSON.stringify(args, null, 2)}`);
 
       try {
         const tool = toolDefinitions.find((t: Tool) => t.method === toolName);
         
         if (!tool) {
           throw new Error(`Unknown tool: ${toolName}`);
-        }
-        
-        console.error(`Executing tool: ${tool.name} (${tool.method})`);
-        
+        }  
         const visaClient = new VisaAcceptanceAPI(this.visaContext)._apiClient;
         const result = await tool.execute(visaClient, this.visaContext, args);
 
@@ -335,9 +329,9 @@ export class VisaAcceptanceAgentToolkit {
     await this.server.connect(serverTransport);
     console.error('Visa Acceptance MCP server running on stdio');
     if (this.visaContext.environment === 'SANDBOX') {
-      console.error('⚠️ Running in SANDBOX ENVIRONMENT (apitest.cybersource.com)');
+      console.error('⚠️ Running in SANDBOX ENVIRONMENT');
     } else {
-      console.error('⚠️ Running in PRODUCTION ENVIRONMENT (api.cybersource.com)');
+      console.error('⚠️ Running in PRODUCTION ENVIRONMENT');
     }
   }
 

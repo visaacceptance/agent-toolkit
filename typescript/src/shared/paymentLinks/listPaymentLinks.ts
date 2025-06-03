@@ -17,8 +17,6 @@ export const listPaymentLinksParameters = (
 
 export const listPaymentLinksPrompt = (context: VisaContext = {} as VisaContext) => `
 This tool will list payment links from Visa Acceptance.
-
-Get a list of payment links with optional filtering by status.
 `;
 
 export const listPaymentLinks = async (
@@ -27,11 +25,7 @@ export const listPaymentLinks = async (
   params: z.infer<ReturnType<typeof listPaymentLinksParameters>>
 ) => {
   try {
-    console.error('Listing payment links with parameters:', JSON.stringify(params, null, 2));
-    
     const paymentLinkApiInstance = new cybersourceRestApi.PaymentLinksApi(visaClient.configuration, visaClient.visaApiClient);
-    
-    console.error('Sending request to Cybersource API to list payment links');
     
     const opts: { status?: string } = {};
     if (params.status) {
@@ -45,10 +39,8 @@ export const listPaymentLinks = async (
         opts,
         (error: any, data: any) => {
           if (error) {
-            console.error('Error from Cybersource API:', error);
             reject(error);
           } else {
-            console.error('Response from Cybersource API:', JSON.stringify(data, null, 2));
             resolve(data);
           }
         }
@@ -57,16 +49,7 @@ export const listPaymentLinks = async (
     
     return result;
   } catch (error) {
-    const errorMessage = error instanceof Error ?
-      `Failed to list payment links: ${error.message}` :
-      'Failed to list payment links: Unknown error';
-    
-    console.error('Error in listPaymentLinks tool:', errorMessage);
-    
-    return {
-      error: errorMessage,
-      stack: error instanceof Error ? error.stack : undefined
-    };
+    return 'Failed to list payment links';
   }
 };
 

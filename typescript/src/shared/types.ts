@@ -1,8 +1,5 @@
 import { z } from 'zod';
 
-/**
- * Context interface for Visa Acceptance API
- */
 export interface VisaContext {
   merchantId: string;
   apiKeyId: string;
@@ -11,9 +8,6 @@ export interface VisaContext {
   mode?: string;
 }
 
-/**
- * Configuration interface for tools and permissions
- */
 export interface Configuration {
   actions?: {
     invoices?: {
@@ -29,16 +23,12 @@ export interface Configuration {
       update?: boolean;
       list?: boolean;
     };
-    // Add more resources as needed
   };
   context?: {
     mode?: string;
   };
 }
 
-/**
- * Tool execution result interface
- */
 export interface ToolExecutionResult {
   success: boolean;
   data?: any;

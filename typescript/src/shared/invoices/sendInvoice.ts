@@ -23,17 +23,13 @@ export const sendInvoice = async (
   params: z.infer<ReturnType<typeof sendInvoiceParameters>>
 ) => {
   try {
-    // Create the InvoicesApi instance with the client configuration
     const invoiceApiInstance = new cybersourceRestApi.InvoicesApi(visaClient.configuration, visaClient.visaApiClient);
     
-    // Call the Cybersource API to send an invoice
     const result = await new Promise((resolve, reject) => {
       invoiceApiInstance.performSendAction(params.invoice_id, (error: any, data: any, response: any) => {
         if (error) {
-          console.error('Error from Cybersource API:', error);
           reject(error);
         } else {
-          console.error('Response from Cybersource API:', JSON.stringify(data, null, 2));
           resolve({
             data,
             status: response['status']
@@ -41,20 +37,11 @@ export const sendInvoice = async (
         }
       });
     });
+    
     const maskedResult = maskInvoiceCustomerInfo(result);
     return maskedResult;
   } catch (error) {
-    const errorMessage = error instanceof Error ?
-      `Failed to send invoice: ${error.message}` :
-      'Failed to send invoice: Unknown error';
-    
-    console.error('Error in sendInvoice tool:', errorMessage);
-    
-    // Return error diagnostic information
-    return {
-      error: errorMessage,
-      stack: error instanceof Error ? error.stack : undefined
-    };
+    return 'Failed to send invoice';
   }
 };
 

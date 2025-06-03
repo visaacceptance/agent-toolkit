@@ -4,7 +4,6 @@ import { VisaContext } from '../types';
 import { Context } from '../configuration';
 import { maskInvoiceCustomerInfo } from '../utils/masking';
 const cybersourceRestApi = require('cybersource-rest-client');
-
 export const getInvoiceParameters = (
   context: VisaContext = {} as VisaContext
 ) => {
@@ -17,17 +16,15 @@ export const getInvoicePrompt = (context: VisaContext = {} as VisaContext) => `
 This tool will get a specific invoice from Visa Acceptance.
 `;
 
+
 export const getInvoice = async (
   visaClient: any,
   context: VisaContext,
   params: z.infer<ReturnType<typeof getInvoiceParameters>>
 ) => {
   try {
-    
-    // Create the InvoicesApi instance with the client configuration
     const invoiceApiInstance = new cybersourceRestApi.InvoicesApi(visaClient.configuration, visaClient.visaApiClient);
     
-    // Call the Cybersource API to get an invoice by ID
     const result = await new Promise((resolve, reject) => {
       invoiceApiInstance.getInvoice(params.id, (error: any, data: any) => {
         if (error) {
@@ -38,21 +35,10 @@ export const getInvoice = async (
       });
     });
     
-    // Apply PII masking to customer information before returning the result
     const maskedResult = maskInvoiceCustomerInfo(result);
-    
     return maskedResult;
   } catch (error) {
-    const errorMessage = error instanceof Error ?
-      `Failed to get invoice: ${error.message}` :
-      'Failed to get invoice: Unknown error';
-
-    
-    // Return error diagnostic information
-    return {
-      error: errorMessage,
-      stack: error instanceof Error ? error.stack : undefined
-    };
+    return 'Failed to get invoice';
   }
 };
 

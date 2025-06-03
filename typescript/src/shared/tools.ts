@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { VisaContext } from './types';
 
-
 import createInvoiceToolModule from './invoices/createInvoice';
 import updateInvoiceToolModule from './invoices/updateInvoice';
 import getInvoiceToolModule from './invoices/getInvoice';
@@ -13,9 +12,6 @@ import updatePaymentLinkToolModule from './paymentLinks/updatePaymentLink';
 import getPaymentLinkToolModule from './paymentLinks/getPaymentLink';
 import listPaymentLinkToolModule from './paymentLinks/listPaymentLinks';
 
-/**
- * Tool interface defining the structure of a tool
- */
 export type Tool = {
   method: string;
   name: string;
@@ -29,10 +25,6 @@ export type Tool = {
   execute: (visaClient: any, context: VisaContext, params: any) => Promise<any>;
 };
 
-
-/**
- * Export a function that returns all tools with context applied
- */
 export function tools(context: VisaContext): Tool[] {
   return [
     createInvoiceToolModule(context),
@@ -48,7 +40,4 @@ export function tools(context: VisaContext): Tool[] {
   ];
 }
 
-/**
- * Default export for backward compatibility
- */
 export default tools;

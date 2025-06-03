@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "description": "Visa Acceptance Agent Toolkit with MCP integration for payment services.",
   "type": "commonjs",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "bin": "dist/index.js",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "bin": "dist/src/index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "node dist/src/index.js",
     "dev": "nodemon --exec ts-node src/index.ts",
     "lint": "eslint . --ext .ts,.js",
     "demo": "node dist/demo-server.js",
@@ -22,6 +22,7 @@
     "@modelcontextprotocol/sdk": "^1.11.0",
     "@types/dotenv": "^6.1.1",
     "@visaacceptance/agent-toolkit": "file:../typescript",
+    "@visaacceptance/mcp": "^0.1.2",
     "colors": "^1.4.0",
     "dotenv": "^16.5.0"
   },
@@ -36,7 +37,6 @@
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
-
   },
   "engines": {
     "node": ">=18"
@@ -63,5 +63,4 @@
     "type": "git",
     "url": "https://github.com/visa-acceptance/agent-toolkit"
   }
-
 }

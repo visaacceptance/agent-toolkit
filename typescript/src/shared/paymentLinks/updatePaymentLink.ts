@@ -42,8 +42,6 @@ export const updatePaymentLinkParameters = (
 
 export const updatePaymentLinkPrompt = (context: VisaContext = {} as VisaContext) => `
 This tool will update a payment link in Visa Acceptance.
-
-Update an existing payment link by its ID.
 `;
 
 export const updatePaymentLink = async (
@@ -52,8 +50,6 @@ export const updatePaymentLink = async (
   params: z.infer<ReturnType<typeof updatePaymentLinkParameters>>
 ) => {
   try {
-    console.error('Updating payment link with parameters:', JSON.stringify(params, null, 2));
-    
     const paymentLinkApiInstance = new cybersourceRestApi.PaymentLinksApi(visaClient.configuration, visaClient.visaApiClient);
     
     const { id, ...updateParams } = params;
@@ -123,15 +119,11 @@ export const updatePaymentLink = async (
       requestObj.clientReferenceInformation = clientReferenceInformation;
     }
     
-    console.error('Sending request to Cybersource API:', JSON.stringify(requestObj, null, 2));
-    
     const result = await new Promise((resolve, reject) => {
       paymentLinkApiInstance.updatePaymentLink(id, requestObj, (error: any, data: any) => {
         if (error) {
-          console.error('Error from Cybersource API:', error);
           reject(error);
         } else {
-          console.error('Response from Cybersource API:', JSON.stringify(data, null, 2));
           resolve(data);
         }
       });
@@ -139,16 +131,7 @@ export const updatePaymentLink = async (
     
     return result;
   } catch (error) {
-    const errorMessage = error instanceof Error ?
-      `Failed to update payment link: ${error.message}` :
-      'Failed to update payment link: Unknown error';
-    
-    console.error('Error in updatePaymentLink tool:', errorMessage);
-    
-    return {
-      error: errorMessage,
-      stack: error instanceof Error ? error.stack : undefined
-    };
+    return 'Failed to update payment link';
   }
 };
 

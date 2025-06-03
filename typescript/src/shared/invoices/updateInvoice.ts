@@ -5,6 +5,52 @@ import { Context } from '../configuration';
 import { maskInvoiceCustomerInfo } from '../utils/masking';
 const cybersourceRestApi = require('cybersource-rest-client');
 
+export const updateInvoicePrompt = (context: VisaContext = {} as VisaContext) => `
+This tool will update an invoice in Visa Acceptance.
+`;
+
+export const updateInvoice = async (
+  visaClient: any,
+  context: VisaContext,
+  params: z.infer<ReturnType<typeof updateInvoiceParameters>>
+) => {
+  try {
+    const { id, ...updateData } = params;
+    const invoiceApiInstance = new cybersourceRestApi.InvoicesApi(visaClient.configuration, visaClient.visaApiClient);
+    
+    if (!updateData.customerInformation || !updateData.invoiceInformation || !updateData.orderInformation) {
+      return 'Failed to update invoice: Missing required nested objects';
+    }
+    
+    if (!updateData.orderInformation.amountDetails ||
+        !updateData.orderInformation.amountDetails.totalAmount ||
+        !updateData.orderInformation.amountDetails.currency) {
+      return 'Failed to update invoice: Missing required fields in orderInformation.amountDetails';
+    }
+    
+    const requestObj = {
+      customerInformation: updateData.customerInformation,
+      orderInformation: updateData.orderInformation,
+      invoiceInformation: updateData.invoiceInformation
+    };
+    
+    const result = await new Promise((resolve, reject) => {
+      invoiceApiInstance.updateInvoice(id, requestObj, (error: any, data: any) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+    
+    const maskedResult = maskInvoiceCustomerInfo(result);
+    return maskedResult;
+  } catch (error) {
+    return 'Failed to update invoice';
+  }
+};
+
 export const updateInvoiceParameters = (
   context: VisaContext = {} as VisaContext
 ) => {
@@ -33,99 +79,6 @@ export const updateInvoiceParameters = (
   });
 };
 
-export const updateInvoicePrompt = (context: VisaContext = {} as VisaContext) => `
-This tool will update an invoice in Visa Acceptance.
-
-IMPORTANT: All nested objects (customerInformation, invoiceInformation, orderInformation) are required, even if some of their properties are optional.
-
-Example usage:
-{
-  "id": "INVOICE-ID-123",
-  "customerInformation": {
-    "name": "Updated Customer Name",
-    "email": "updated.email@example.com"
-  },
-  "invoiceInformation": {
-    "description": "Updated invoice description",
-    "dueDate": "2025-06-17",
-    "allowPartialPayments": false,
-    "deliveryMode": "email"
-  },
-  "orderInformation": {
-    "amountDetails": {
-      "totalAmount": "75.00",
-      "currency": "USD"
-    }
-  }
-}
-`;
-
-export const updateInvoice = async (
-  visaClient: any,
-  context: VisaContext,
-  params: z.infer<ReturnType<typeof updateInvoiceParameters>>
-) => {
-  const { id, ...updateData } = params;
-  
-  try {
-    const invoiceApiInstance = new cybersourceRestApi.InvoicesApi(visaClient.configuration, visaClient.visaApiClient);
-    
-    if (!updateData.customerInformation || !updateData.invoiceInformation || !updateData.orderInformation) {
-      return {
-        error: 'Failed to update invoice: Missing required nested objects. Please ensure customerInformation, invoiceInformation, and orderInformation are all included.'
-      };
-    }
-    
-    if (!updateData.orderInformation.amountDetails ||
-        !updateData.orderInformation.amountDetails.totalAmount ||
-        !updateData.orderInformation.amountDetails.currency) {
-      return {
-        error: 'Failed to update invoice: Missing required fields in orderInformation.amountDetails. Both totalAmount and currency are required.'
-      };
-    }
-    
-    const requestObj = {
-      customerInformation: updateData.customerInformation,
-      orderInformation: updateData.orderInformation,
-      invoiceInformation: updateData.invoiceInformation
-    };
-    
-    const result = await new Promise((resolve, reject) => {
-      invoiceApiInstance.updateInvoice(id, requestObj, (error: any, data: any) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(data);
-        }
-      });
-    });
-    
-    const maskedResult = maskInvoiceCustomerInfo(result);
-    
-    return maskedResult;
-  } catch (error) {
-    let errorMessage = 'Failed to update invoice: Unknown error';
-    
-    if (error instanceof Error) {
-      errorMessage = `Failed to update invoice: ${error.message}`;
-      
-      if (error.message.includes('not found')) {
-        errorMessage = `Failed to update invoice: Invoice with ID '${id}' not found`;
-      } else if (error.message.includes('validation')) {
-        errorMessage = `Failed to update invoice: Validation error in request data. Please check all required fields.`;
-      } else if (error.message.includes('authentication') || error.message.includes('unauthorized')) {
-        errorMessage = `Failed to update invoice: Authentication error. Please check API credentials.`;
-      }
-    }
-    
-    console.error('Error in updateInvoice tool:', errorMessage);
-    
-    return {
-      error: errorMessage,
-      stack: error instanceof Error ? error.stack : undefined
-    };
-  }
-};
 
 const tool = (context: VisaContext): Tool => ({
   method: 'update_invoice',

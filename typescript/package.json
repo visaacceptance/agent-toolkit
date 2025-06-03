@@ -12,6 +12,7 @@
     "start": "ts-node src/index.ts",
     "dev": "ts-node-dev --respawn src/index.ts",
     "lint": "eslint . --ext .ts",
+    "prepare": "npm run build",
     "test": "jest"
   },
   "author": "",

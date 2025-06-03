@@ -35,9 +35,9 @@ export type Context = {
  */
 export function createContext(options: any): VisaContext {
   return {
-    merchantId: options.merchantId || process.env.VISA_ACCEPTANCE_MERCHANT_ID || 'testrest',
-    apiKeyId: options.apiKeyId || process.env.VISA_ACCEPTANCE_API_KEY_ID || '08c94330-f618-42a3-b09d-e1e43be5efda',
-    secretKey: options.secretKey || process.env.VISA_ACCEPTANCE_SECRET_KEY || 'yBJxy6LjM2TmcPGu+GaJrHtkke25fPpUX+UY6/L/1tE=',
+    merchantId: options.merchantId || process.env.VISA_ACCEPTANCE_MERCHANT_ID,
+    apiKeyId: options.apiKeyId || process.env.VISA_ACCEPTANCE_API_KEY_ID,
+    secretKey: options.secretKey || process.env.VISA_ACCEPTANCE_SECRET_KEY,
     environment: options.environment || process.env.VISA_ACCEPTANCE_ENVIRONMENT || 'SANDBOX',
     mode: options.mode || 'modelcontextprotocol'
   };

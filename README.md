@@ -104,39 +104,6 @@ The [Model Context Protocol (MCP)](https://modelcontextprotocol.com/) is also su
 npx -y @visaacceptance/mcp --tools=all --merchant-id=YOUR_MERCHANT_ID --api-key-id=YOUR_API_KEY_ID --secret-key=YOUR_SECRET_KEY
 ```
 
-Or use your own MCP server configuration like so:
-
-```typescript
-import { VisaAcceptanceAgentToolkit } from "@visaacceptance/agent-toolkit/modelcontextprotocol";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-
-const server = new VisaAcceptanceAgentToolkit({
-  merchantId: process.env.MERCHANT_ID!,
-  apiKeyId: process.env.API_KEY_ID!,
-  secretKey: process.env.SECRET_KEY!,
-  configuration: {
-    actions: {
-      invoices: {
-        create: true
-      },
-      paymentLinks: {
-        create: true
-      },
-    },
-  },
-});
-
-async function main() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("Visa Acceptance MCP Server running on stdio");
-}
-
-main().catch((error) => {
-  console.error("Fatal error in main():", error);
-  process.exit(1);
-});
-```
 
 ## Supported API Methods
 

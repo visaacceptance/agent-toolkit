@@ -33,16 +33,13 @@ export const createInvoice = async (
   params: z.infer<ReturnType<typeof createInvoiceParameters>>
 ) => {
   try {
-    console.error('Creating invoice with parameters:', JSON.stringify(params, null, 2));
-    console.error('Creating invoice with parameters:', JSON.stringify(params, null, 2));
-    
     const invoiceApiInstance = new cybersourceRestApi.InvoicesApi(visaClient.configuration, visaClient.visaApiClient);
     
     const requestObj = {
-      merchantId: context.merchantId, 
+      merchantId: context.merchantId,
       customerInformation: {
-        name: params.customer_name || (params?.customer_name), 
-        email: params.customer_email || (params?.customer_email) 
+        name: params.customer_name,
+        email: params.customer_email
       },
       orderInformation: {
         amountDetails: {
@@ -52,41 +49,27 @@ export const createInvoice = async (
       },
       invoiceInformation: {
         description: params.invoiceInformation?.description,
-        dueDate: params.invoiceInformation?.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Use provided due date or default to 30 days from now
+        dueDate: params.invoiceInformation?.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         invoiceNumber: params.invoice_number,
         sendImmediately: params.invoiceInformation?.sendImmediately !== undefined ? params.invoiceInformation.sendImmediately : true,
         deliveryMode: params.invoiceInformation?.deliveryMode || 'email'
       }
     };
     
-    console.error('Sending request to Cybersource API:', JSON.stringify(requestObj, null, 2));
-    
     const result = await new Promise((resolve, reject) => {
       invoiceApiInstance.createInvoice(requestObj, (error: any, data: any) => {
         if (error) {
-          console.error('Error from Cybersource API:', error);
-          console.error('Error from Cybersource API:', error);
           reject(error);
         } else {
-          console.error('Response from Cybersource API:', JSON.stringify(data, null, 2));
-          console.error('Response from Cybersource API:', JSON.stringify(data, null, 2));
           resolve(data);
         }
       });
     });
     
     const maskedResult = maskInvoiceCustomerInfo(result);
-    
     return maskedResult;
   } catch (error) {
-    const errorMessage = error instanceof Error ?
-      `Failed to create invoice: ${error.message}` :
-      'Failed to create invoice: Unknown error';
-    console.error('Error in createInvoice tool:', errorMessage);
-    return {
-      error: errorMessage,
-      stack: error instanceof Error ? error.stack : undefined
-    };
+    return 'Failed to create invoice';
   }
 };
 

@@ -197,7 +197,7 @@ SECRET_KEY=your_secret_key
 # Environment Configuration
 # When true, points to apitest.visa-acceptance.com (non-production)
 # When false, points to api.visa-acceptance.com (production)
-VISA_ACCEPTANCE_USE_TEST_ENV=true
+VISA_ACCEPTANCE_ENVIRONMENT=SANDBOX
 VISA_ACCEPTANCE_AUTH_TYPE=http_signature
 
 # Tools Configuration
