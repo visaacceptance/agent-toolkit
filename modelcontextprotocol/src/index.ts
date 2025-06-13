@@ -3,7 +3,7 @@
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import dotenv from 'dotenv';
 import { green, yellow, red } from 'colors';
-import { VisaAcceptanceAgentToolkit } from '@visaacceptance/agent-toolkit';
+import { VisaAcceptanceAgentToolkit } from '@visaacceptance/test-agent-toolkit/modelcontextprotocol';
 
 
 dotenv.config();
@@ -90,17 +90,13 @@ export async function main(): Promise<void> {
   try {
     const options = parseArgs(process.argv.slice(2));
 
-    const toolsFromEnv = process.env.ACCEPTANCE_TOOLS ?
-      process.env.ACCEPTANCE_TOOLS.split(',') :
-      process.env.VISA_ACCEPTANCE_TOOLS ?
+    const toolsFromEnv = process.env.VISA_ACCEPTANCE_TOOLS ?
         process.env.VISA_ACCEPTANCE_TOOLS.split(',') :
         undefined;
     
     const selectedTools = options.tools || toolsFromEnv;
     const toolkitConfig: ToolkitConfig = {
-      actions: {
-        invoices: {}
-      }
+      actions: {}
     };
 
     if (!selectedTools) {
@@ -110,15 +106,19 @@ export async function main(): Promise<void> {
     if (selectedTools.includes('all')) {
       ACCEPTED_TOOLS.forEach((tool) => {
         const [product, action] = tool.split('.');
-        toolkitConfig.actions[product] = {
-          ...toolkitConfig.actions[product],
-          [action]: true,
-        };
+        toolkitConfig.actions[product] = {[action]: true};
       });
     } else {
       selectedTools.forEach((tool: string) => {
-        const [product, action] = tool.split('.');        
-        toolkitConfig.actions[product] = {[action]: true};
+        const [product, action] = tool.split('.');
+        
+        // Initialize the product object if it doesn't exist
+        if (!toolkitConfig.actions[product]) {
+          toolkitConfig.actions[product] = {};
+        }
+        
+        // Add the action directly
+        toolkitConfig.actions[product][action] = true;
       });
     }
 
@@ -141,10 +141,10 @@ export async function main(): Promise<void> {
 
     console.error(green('✅ Visa Acceptance MCP server running on stdio'));
 
-    if (options.environment === 'SANDBOX' || process.env.VISA_ACCEPTANCE_ENVIRONMENT === 'SANDBOX') {
-      console.error(yellow(`⚠️ Running in SANDBOX ENVIRONMENT`));
+    if (options.environment === 'PRODUCTION' || process.env.VISA_ACCEPTANCE_ENVIRONMENT === 'PRODUCTION') {
+      console.error(yellow(`⚠️ Running in PRODUCTION ENVIRONMENT`));
     } else {
-      console.error(yellow('⚠️ Running in PRODUCTION ENVIRONMENT'));
+      console.error(yellow('⚠️ Running in SANDBOX ENVIRONMENT'));
     }
   } catch (error) {
     handleError(error);

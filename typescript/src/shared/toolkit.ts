@@ -328,10 +328,10 @@ export class VisaAcceptanceAgentToolkit {
     const serverTransport = transport || new StdioServerTransport();
     await this.server.connect(serverTransport);
     console.error('Visa Acceptance MCP server running on stdio');
-    if (this.visaContext.environment === 'SANDBOX') {
-      console.error('⚠️ Running in SANDBOX ENVIRONMENT');
-    } else {
+    if (this.visaContext.environment === 'PRODUCTION') {
       console.error('⚠️ Running in PRODUCTION ENVIRONMENT');
+    } else {
+      console.error('⚠️ Running in SANDBOX ENVIRONMENT');
     }
   }
 

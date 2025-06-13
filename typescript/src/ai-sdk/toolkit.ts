@@ -23,7 +23,7 @@ class VisaAcceptanceAgentToolkit {
    * Creates a new Visa Acceptance Agent Toolkit
    * @param options Configuration options matching Stripe's pattern
    */
-  constructor( merchantIdTool: string | undefined, merchantKeyIdTool : string | undefined, secretKeyTool: string | undefined, configuration: Configuration = {}) {
+  constructor( merchantIdTool: string | undefined, merchantKeyIdTool : string | undefined, secretKeyTool: string | undefined, environment?: string, configuration: Configuration = {}) {
     this.credentials = {
       secretKey: secretKeyTool || process.env.VISA_ACCEPTANCE_SECRET_KEY,
       merchantId: merchantIdTool || process.env.VISA_ACCEPTANCE_MERCHANT_ID,
@@ -36,17 +36,15 @@ class VisaAcceptanceAgentToolkit {
       merchantId: this.credentials.merchantId || '',
       apiKeyId: this.credentials.merchantKeyId || '',
       secretKey: this.credentials.secretKey || '',
-      environment: 'SANDBOX'
+      environment: environment || 'SANDBOX'
     };
     this.api = new VisaAcceptanceAPI(visaContext);
     this.tools = {};
     // Set configuration with defaults
     this.configuration = configuration;
     
-    // Log all available tools before filtering
     const allTools = tools(visaContext);
 
-    // Log each tool filtering decision
     const filteredTools = allTools.filter((tool) => {
       const allowed = isToolAllowed(tool, configuration);
       return allowed;

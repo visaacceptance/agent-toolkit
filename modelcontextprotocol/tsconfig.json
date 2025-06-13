@@ -28,7 +28,7 @@
     "types/**/*.d.ts"
   ],
   "references": [
-    { "path": "../typescript" }
+
   ],
   "exclude": [
     "node_modules",

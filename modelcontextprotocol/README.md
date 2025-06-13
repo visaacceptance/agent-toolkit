@@ -10,7 +10,7 @@ This package is designed to be used as a local npm package during development. F
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/visa-acceptance/agent-toolkit.git
+   git clone https://github.com/visaacceptance/agent-toolkit.git
    cd agent-toolkit/modelcontextprotocol
    ```
 
@@ -75,7 +75,7 @@ To run the Visa Acceptance MCP server using npx, use the following command:
 npx -y @visaacceptance/mcp --tools=all --merchant-id=YOUR_MERCHANT_ID --api-key-id=YOUR_API_KEY_ID --secret-key=YOUR_SECRET_KEY
 
 # To set up specific tools 
-npx -y @visaacceptance/mcp --tools=invoices.create,invoices.list,paymentLinks.create,paymentLinks.list --merchant-id=YOUR_MERCHANT_ID --api-key-id=YOUR_API_KEY_ID --secret-key=YOUR_SECRET_KEY
+npx -y @visaacceptance/mcp --tools=invoices.create,invoices.read,paymentLinks.create,paymentLinks.read --merchant-id=YOUR_MERCHANT_ID --api-key-id=YOUR_API_KEY_ID --secret-key=YOUR_SECRET_KEY
 
 # To configure test environment (default is true)
 npx -y @visaacceptance/mcp --tools=all --merchant-id=YOUR_MERCHANT_ID --api-key-id=YOUR_API_KEY_ID --secret-key=YOUR_SECRET_KEY --use-test-env=true

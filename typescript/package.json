@@ -1,20 +1,43 @@
 {
-  "name": "@visaacceptance/agent-toolkit",
-  "version": "0.1.0",
+  "name": "@visaacceptance/test-agent-toolkit",
+  "version": "0.1.3",
   "description": "This toolkit provides a TypeScript implementation for interacting with Visa Acceptance APIs.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "index.js",
+  "types": "index.d.ts",
   "directories": {
     "example": "examples"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsup",
     "start": "ts-node src/index.ts",
     "dev": "ts-node-dev --respawn src/index.ts",
     "lint": "eslint . --ext .ts",
     "prepare": "npm run build",
     "test": "jest"
   },
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    },
+    "./ai-sdk": {
+      "types": "./ai-sdk/index.d.ts",
+      "default": "./ai-sdk/index.js"
+    },
+    "./modelcontextprotocol": {
+      "types": "./modelcontextprotocol/index.d.ts",
+      "default": "./modelcontextprotocol/index.js"
+    }
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "ai-sdk/**/*",
+    "modelcontextprotocol/**/*",
+    "LICENSE",
+    "README.md",
+    "package.json"
+  ],
   "author": "",
   "license": "MIT",
   "engines": {
@@ -29,6 +52,7 @@
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
+    "tsup": "^8.5.0",
     "typescript": "^5.8.3"
   },
   "dependencies": {

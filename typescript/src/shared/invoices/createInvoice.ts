@@ -15,10 +15,10 @@ export const createInvoiceParameters = (
     customer_name: z.string().optional().describe('Customer name'),
     customer_email: z.string().optional().describe('Customer email'),
     invoiceInformation: z.object({
-      description: z.string().describe('Extremely short invoice description (max 50 characters)'),
+      description: z.string().describe('Short invoice description (max 50 characters)'),
       dueDate: z.string().describe('Due date in YYYY-MM-DD format'),
-      sendImmediately: z.boolean().optional().describe('Whether to send the invoice immediately'),
-      deliveryMode: z.string().optional().describe('Delivery mode e.g. "email"')
+      sendImmediately: z.boolean().describe('Whether to send the invoice immediately'),
+      deliveryMode: z.string().describe('Delivery mode e.g. "email"')
     }).required().describe('Invoice information object'),
   });
 };

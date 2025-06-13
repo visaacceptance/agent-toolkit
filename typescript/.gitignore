@@ -6,7 +6,7 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
-.env
+
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
@@ -41,6 +41,7 @@ build/Release
 # Dependency directories
 node_modules/
 jspm_packages/
+junk/
 
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
@@ -104,12 +105,6 @@ dist
 .temp
 .cache
 
-# vitepress build output
-**/.vitepress/dist
-
-# vitepress cache directory
-**/.vitepress/cache
-
 # Docusaurus cache and generated files
 .docusaurus
 
@@ -135,57 +130,7 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# Python
-*.py[cod]
-__pycache__/
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-*.manifest
-*.spec
-pip-log.txt
-pip-delete-this-directory.txt
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-cover/
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-.venv/
+.turbo
 
-.DS_Store
-modelcontextprotocol/package-lock.json
-typescript/package-lock.json
-typescript/examples/ai-sdk/package-lock.json
-
-*.tsbuildinfo
+/ai-sdk/
+/modelcontextprotocol/
