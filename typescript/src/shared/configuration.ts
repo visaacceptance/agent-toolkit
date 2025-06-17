@@ -1,3 +1,11 @@
+/* © 2025 Visa.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 import { VisaContext } from './types';
 import { Configuration as ImportedConfiguration } from './types';
 
@@ -77,21 +85,20 @@ export function isToolAllowed(tool: Tool, config: Configuration): boolean {
 }
 
 /**
- * Get Cybersource configuration
+ * Get Visa Acceptance configuration
  */
-export function getVisaAcceptanceConfig() {
+export function getVisaAcceptanceConfig(context: VisaContext) {
 
   const config = {
     authenticationType: 'http_signature',
     runEnvironment: process.env.VISA_ACCEPTANCE_ENVIRONMENT === 'SANDBOX' ? 'apitest.cybersource.com' : 'api.cybersource.com',
     
     /**
-     * Merchant credentials - check for both new simplified names AND old names for backward compatibility
-     * New simplified names take precedence if both are defined
+     * Merchant credentials 
      */
-    merchantID: process.env.VISA_ACCEPTANCE_MERCHANT_ID || '',
-    merchantKeyId: process.env.VISA_ACCEPTANCE_API_KEY_ID || '',
-    merchantsecretKey: process.env.VISA_ACCEPTANCE_SECRET_KEY || '',
+    merchantID: process.env.VISA_ACCEPTANCE_MERCHANT_ID ||  context.merchantId ||'',
+    merchantKeyId: process.env.VISA_ACCEPTANCE_API_KEY_ID || context.apiKeyId || '',
+    merchantsecretKey: process.env.VISA_ACCEPTANCE_SECRET_KEY || context.secretKey || '',
     
     keyAlias: process.env.KEY_ALIAS,
     keyPass: process.env.KEY_PASS,

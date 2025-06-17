@@ -1,6 +1,6 @@
 {
-  "name": "@visaacceptance/test-agent-toolkit",
-  "version": "0.1.3",
+  "name": "@visaacceptance/agent-toolkit",
+  "version": "0.1.0",
   "description": "This toolkit provides a TypeScript implementation for interacting with Visa Acceptance APIs.",
   "main": "index.js",
   "types": "index.d.ts",

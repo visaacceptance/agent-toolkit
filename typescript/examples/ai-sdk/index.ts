@@ -39,7 +39,7 @@ const visaAcceptanceAgentToolkit = new VisaAcceptanceAgentToolkit(
 
 async function aiGeneratedPaymentLink() {
   console.log("Attempting to generate a payment link...");
-  const userPrompt = `Create a payment link for a Ski Trip to Whistler, Canada. The total amount is $1000.00.`;
+  const userPrompt = `Create a payment link for a {Location} with a compelling selling point in the description. The total amount is $1000.00.`;
   const result = await generateText({
     model: openai('gpt-4o'),
     tools: {

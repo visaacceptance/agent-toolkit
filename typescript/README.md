@@ -69,7 +69,7 @@ const visaAcceptanceAgentToolkit = new VisaAcceptanceAgentToolkit({
   secretKey: process.env.SECRET_KEY!,
   configuration: {
     context: {
-      useTestEnvironment: true,
+      environment: 'SANDBOX', // or 'PRODUCTION'
     },
   },
 });
@@ -147,6 +147,7 @@ const result = await generateText({
           with description "Premium Subscription" that should be sent immediately via email`,
 });
 
+console.log('Invoice creation result:', result);
 
 ```
 
