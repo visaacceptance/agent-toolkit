@@ -1,7 +1,11 @@
 # Visa Acceptance Agent Toolkit
 
-The Visa Acceptance Agent Toolkit seamlessly integrates with popular agent frameworks, including OpenAI's Agent SDK, Vercel's AI SDK, and the Model Context Protocol (MCP), for Visa Acceptance APIs. It offers a specialized set of tools designed to help you manage invoices, create payment links, and perform other Visa Acceptance-related operations.
+The Visa Acceptance Agent Toolkit seamlessly integrates with Vercel's AI SDK and the Model Context Protocol (MCP) for Visa Acceptance APIs. It offers a specialized set of tools designed to help you manage invoices, create payment links, and perform other Visa Acceptance-related operations.
 
+## Supported Frameworks
+
+- **Vercel AI SDK** - Full integration with function calling and tool support
+- **Model Context Protocol (MCP)** - Complete MCP server implementation
 ## TypeScript
 
 ### Installation
@@ -90,7 +94,7 @@ const toolkit = new VisaAcceptanceAgentToolkit({
   secretKey: process.env.SECRET_KEY!,
   configuration: {
     context: {
-      useTestEnvironment: true,
+      environment: "SANDBOX",
     },
   },
 });
@@ -109,10 +113,19 @@ npx -y @visaacceptance/mcp --tools=all --merchant-id=YOUR_MERCHANT_ID --api-key-
 
 The toolkit currently provides the following Visa Acceptance operations:
 
-- **Invoices**  
+- **Invoices**
+  - Create an invoice - Create a new invoice with customer information and enhanced parameters
+  - Update an invoice - Update existing invoice details including customer and invoice information
+  - List invoices - Retrieve paginated list of invoices with filtering options
+  - Get invoice - Retrieve detailed information for a specific invoice
+  - Send invoice - Send invoice to customer via email
+  - Cancel invoice - Cancel an existing invoice
 
-
-- **Payment Links**  
+- **Payment Links**
+  - Create a payment link - Create a new payment link with optional shipping information
+  - Update a payment link - Update existing payment link details
+  - List payment links - Retrieve paginated list of payment links
+  - Get payment link - Retrieve details of a specific payment link
 
 
 ## DISCLAIMER
