@@ -51,11 +51,11 @@ class VisaAcceptanceAgentToolkit extends McpServer {
         merchantId: this.credentials.merchantId || '',
         apiKeyId: this.credentials.merchantKeyId || '',
         secretKey: this.credentials.secretKey || '',
-        environment: options.environment || 'SANDBOX'
+        environment: options.environment || 'SANDBOX',
+        mode: 'modelcontextprotocol'
       };
       this._visaAcceptanceAPI = new VisaAcceptanceAPI(visaContext);
 
-    const context = (options.configuration?.context) || {};
     const filteredTools = tools(visaContext).filter((tool) =>
       isToolAllowed(tool, options.configuration || {})
     );

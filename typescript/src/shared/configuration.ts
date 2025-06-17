@@ -110,7 +110,7 @@ export function getVisaAcceptanceConfig(context: VisaContext) {
     
     pemFileDirectory: process.env.PEM_FILE_DIRECTORY,
     
-    defaultDeveloperId: process.env.DEFAULT_DEVELOPER_ID,
+    defaultDeveloperId: context.mode === 'modelcontextprotocol' ? 'N05YN5UH' : 'A2R8EP3K',
     
     logConfiguration: {
       enableLog: false,

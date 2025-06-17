@@ -44,7 +44,8 @@ class VisaAcceptanceAgentToolkit {
       merchantId: this.credentials.merchantId || '',
       apiKeyId: this.credentials.merchantKeyId || '',
       secretKey: this.credentials.secretKey || '',
-      environment: environment || 'SANDBOX'
+      environment: environment || 'SANDBOX',
+      mode: 'agent-toolkit'
     };
     this.api = new VisaAcceptanceAPI(visaContext);
     this.tools = {};
