@@ -22,6 +22,7 @@
     "@modelcontextprotocol/sdk": "^1.11.0",
     "@types/dotenv": "^6.1.1",
     "@visaacceptance/agent-toolkit": "^0.1.0",
+    "@visaacceptance/test-agent-toolkit": "npm:@visaacceptance/agent-toolkit@^0.1.0",
     "colors": "^1.4.0",
     "dotenv": "^16.5.0"
   },

@@ -6,11 +6,12 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+/* START GENAI */
 import { z } from 'zod';
 import { Tool } from '../tools';
 import { VisaContext } from '../types';
 import { Context } from '../configuration';
-import { maskPII } from '../utils/masking';
+import { maskPII } from '../utils/util';
 const cybersourceRestApi = require('cybersource-rest-client');
 
 export const listPaymentLinksParameters = (
@@ -64,7 +65,7 @@ export const listPaymentLinks = async (
 const tool = (context: VisaContext): Tool => ({
   method: 'list_payment_links',
   name: 'List Payment Links',
-  description: 'Get a list of payment links with optional filtering by status.',
+  description: listPaymentLinksPrompt(context),
   parameters: listPaymentLinksParameters(context),
   actions: {
     paymentLinks: {
@@ -75,3 +76,4 @@ const tool = (context: VisaContext): Tool => ({
 });
 
 export default tool;
+/* END GENAI */

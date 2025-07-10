@@ -6,11 +6,12 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+/* START GENAI */
 import { z } from 'zod';
 import { Tool } from '../tools';
 import { VisaContext } from '../types';
 import { Context } from '../configuration';
-import { maskPII } from '../utils/masking';
+import { maskPII } from '../utils/util';
 const cybersourceRestApi = require('cybersource-rest-client');
 
 /**
@@ -35,6 +36,7 @@ export const updatePaymentLinkParameters = (
     totalAmount: z.string().optional().describe('Total payment amount e.g. "100.00"'),
     requestPhone: z.boolean().optional().describe('Request phone number from customer'),
     requestShipping: z.boolean().optional().describe('Request shipping address from customer'),
+    clientReferenceCode: z.string().optional().describe('Custom client reference code for the transaction'),
     lineItems: z.array(
       z.object({
         productName: z.string().describe('Name of the product'),
@@ -121,11 +123,13 @@ export const updatePaymentLink = async (
       requestObj.orderInformation = orderInformation;
     }
     
-    if (context.merchantId) {
-      const clientReferenceInformation = new cybersourceRestApi.Invoicingv2invoicesClientReferenceInformation();
+    const clientReferenceInformation = new cybersourceRestApi.Invoicingv2invoicesClientReferenceInformation();
+    if (params.clientReferenceCode) {
+      clientReferenceInformation.code = params.clientReferenceCode;
+    } else if (context.merchantId) {
       clientReferenceInformation.code = context.merchantId;
-      requestObj.clientReferenceInformation = clientReferenceInformation;
     }
+    requestObj.clientReferenceInformation = clientReferenceInformation;
     
     const result = await new Promise((resolve, reject) => {
       paymentLinkApiInstance.updatePaymentLink(id, requestObj, (error: any, data: any) => {
@@ -146,7 +150,7 @@ export const updatePaymentLink = async (
 const tool = (context: VisaContext): Tool => ({
   method: 'update_payment_link',
   name: 'Update Payment Link',
-  description: 'Update an existing payment link by its ID.',
+  description: updatePaymentLinkPrompt(context),
   parameters: updatePaymentLinkParameters(context),
   actions: {
     paymentLinks: {
@@ -157,3 +161,4 @@ const tool = (context: VisaContext): Tool => ({
 });
 
 export default tool;
+/* END GENAI */

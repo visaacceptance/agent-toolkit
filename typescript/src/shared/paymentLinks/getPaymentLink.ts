@@ -6,6 +6,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+/* START GENAI */
 import { z } from 'zod';
 import { Tool } from '../tools';
 import { VisaContext } from '../types';
@@ -53,7 +54,7 @@ export const getPaymentLink = async (
 const tool = (context: VisaContext): Tool => ({
   method: 'get_payment_link',
   name: 'Get Payment Link',
-  description: 'Get details of a payment link by its ID.',
+  description: getPaymentLinkPrompt(context),
   parameters: getPaymentLinkParameters(context),
   actions: {
     paymentLinks: {
@@ -64,3 +65,4 @@ const tool = (context: VisaContext): Tool => ({
 });
 
 export default tool;
+/* END GENAI */

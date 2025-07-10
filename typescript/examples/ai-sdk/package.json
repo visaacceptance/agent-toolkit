@@ -1,7 +1,7 @@
 {
   "name": "visa-acceptance-agent-toolkit-ai-sdk-example",
   "version": "0.1.0",
-  "description": "Example using VisaAcceptanceAgentToolkit with AI SDK",
+  "description": "Example using Visa Acceptance AgentToolkit with AI SDK",
   "scripts": {
     "start": "ts-node index.ts"
   },

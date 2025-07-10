@@ -7,26 +7,30 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 /* START GENAI */
-import type {CoreTool} from 'ai';
-import {tool} from 'ai';
-import {z} from 'zod';
-import VisaAcceptanceAPI from '../shared/api';
+import { VisaContext } from '../types';
 
-
-
-export default function VisaAcceptanceTool(
-    visaAcceptanceAPI: VisaAcceptanceAPI,
-    method: string,
-    description: string,
-    schema: z.ZodObject<any, any, any, any, {[x: string]: any}>
-  ): CoreTool {
-    return tool({
-      description: description,
-      parameters: schema,
-      execute: async (arg: z.output<typeof schema>) => {
-        // Use type assertion to ensure TypeScript recognizes the run method
-        return (visaAcceptanceAPI as any).run(method, arg);
-      },
-    });
+/**
+ * Sets the developer ID in the request object based on the context mode
+ * @param requestObj The request object to update
+ * @param context The Visa context containing the mode
+ * @returns The updated request object
+ */
+export function setDeveloperId(requestObj: any, context: VisaContext): any {
+  // Initialize clientReferenceInformation if it doesn't exist
+  if (!requestObj.clientReferenceInformation) {
+    requestObj.clientReferenceInformation = {};
   }
-/* END GENAI */
+  /* END GENAI */
+  
+  // Initialize partner object if it doesn't exist
+  if (!requestObj.clientReferenceInformation.partner) {
+    requestObj.clientReferenceInformation.partner = {};
+  }
+  console.error(context);
+  // Set the developer ID based on the context mode
+  requestObj.clientReferenceInformation.partner.developerId = 
+    context?.mode === 'modelcontextprotocol' ? 'N05YN5UH' : 'A2R8EP3K';
+    
+  
+  return requestObj;
+}

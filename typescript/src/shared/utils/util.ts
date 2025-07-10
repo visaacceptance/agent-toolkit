@@ -7,9 +7,40 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 /* START GENAI */
-import type {Context} from '../configuration';
+import { VisaContext } from '../types';
+import type { Context } from '../configuration';
 
+/**
+ * Sets the developer ID in the request object based on the context mode
+ * @param requestObj The request object to update
+ * @param context The Visa context containing the mode
+ * @returns The updated request object
+ */
+export function setDeveloperId(requestObj: any, context: VisaContext): any {
+  // Initialize clientReferenceInformation if it doesn't exist
+  if (!requestObj.clientReferenceInformation) {
+    requestObj.clientReferenceInformation = {};
+  }
+  
+  // Initialize partner object if it doesn't exist
+  if (!requestObj.clientReferenceInformation.partner) {
+    requestObj.clientReferenceInformation.partner = {};
+  }
+  console.error(context);
+  // Set the developer ID based on the context mode
+  requestObj.clientReferenceInformation.partner.developerId = 
+    context?.mode === 'modelcontextprotocol' ? 'N05YN5UH' : 'A2R8EP3K';
+    
+  
+  return requestObj;
+}
 
+/**
+ * Masks personally identifiable information (PII) in a string
+ * @param value The string to mask
+ * @param maskPosition Position to apply masking (start, end, or random)
+ * @returns The masked string
+ */
 export const maskPII = (
   value: string,
   maskPosition: 'start' | 'end' | 'random' = 'end'
@@ -52,6 +83,9 @@ export const maskPII = (
 
 /**
  * Masks customer information in an invoice object
+ * @param invoice The invoice object to mask
+ * @param context The context
+ * @returns The masked invoice object
  */
 export const maskInvoiceCustomerInfo = (
   invoice: any,
@@ -87,6 +121,9 @@ export const maskInvoiceCustomerInfo = (
 
 /**
  * Masks customer information in an array of invoice objects
+ * @param invoices The array of invoice objects to mask
+ * @param context The context
+ * @returns The array of masked invoice objects
  */
 export const maskInvoicesCustomerInfo = (
   invoices: any[],
