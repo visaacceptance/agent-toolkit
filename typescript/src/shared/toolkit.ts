@@ -54,7 +54,7 @@ export interface VisaContext {
 
 /**
  * Configuration interface for Visa Acceptance Agent Toolkit
- * Follows the pattern from the Stripe example
+ * 
  */
 export interface VisaAcceptanceAgentToolkitOptions {
   merchantId?: string;

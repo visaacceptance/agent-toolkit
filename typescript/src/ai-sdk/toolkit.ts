@@ -30,7 +30,7 @@ class VisaAcceptanceAgentToolkit {
 
   /**
    * Creates a new Visa Acceptance Agent Toolkit
-   * @param options Configuration options matching Stripe's pattern
+   * @param options Configuration options 
    */
   constructor( merchantIdTool: string | undefined, merchantKeyIdTool : string | undefined, secretKeyTool: string | undefined, environment?: string, configuration: Configuration = {}) {
     this.credentials = {
