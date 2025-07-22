@@ -8,13 +8,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
  */
 /* START GENAI */
 import type { Tool } from 'ai';
-import VisaAcceptanceAPI from '../shared/api';
+import { VisaAcceptanceAPI } from '../shared/api';
 import { VisaContext } from '../shared/types';
 import VisaAcceptanceTool from './tool';
 import { z } from 'zod';
 import {isToolAllowed} from '../shared/configuration';
 import {Configuration} from '../shared/types';
-import tools from '../shared/tools';
+import { tools } from '../shared/tools';
 
 class VisaAcceptanceAgentToolkit {
   private api: VisaAcceptanceAPI;
@@ -55,12 +55,12 @@ class VisaAcceptanceAgentToolkit {
     
     const allTools = tools(visaContext);
 
-    const filteredTools = allTools.filter((tool) => {
+    const filteredTools = allTools.filter((tool: any) => {
       const allowed = isToolAllowed(tool, configuration);
       return allowed;
     });
     
-    filteredTools.forEach((tool) => {
+    filteredTools.forEach((tool: any) => {
       this.tools[tool.method] = VisaAcceptanceTool(this.api, tool.method, tool.description, tool.parameters);
     });
   }

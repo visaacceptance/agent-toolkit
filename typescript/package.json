@@ -18,15 +18,18 @@
   "exports": {
     ".": {
       "types": "./index.d.ts",
-      "default": "./index.js"
+      "require": "./index.js",
+      "import": "./index.mjs"
     },
     "./ai-sdk": {
       "types": "./ai-sdk/index.d.ts",
-      "default": "./ai-sdk/index.js"
+      "require": "./ai-sdk/index.js",
+      "import": "./ai-sdk/index.mjs"
     },
     "./modelcontextprotocol": {
       "types": "./modelcontextprotocol/index.d.ts",
-      "default": "./modelcontextprotocol/index.js"
+      "require": "./modelcontextprotocol/index.js",
+      "import": "./modelcontextprotocol/index.mjs"
     }
   },
   "files": [

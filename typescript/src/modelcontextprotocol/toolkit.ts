@@ -11,8 +11,9 @@ import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import {RequestHandlerExtra} from '@modelcontextprotocol/sdk/shared/protocol.js';
 import {Configuration, isToolAllowed} from '../shared/configuration';
 import { VisaContext } from '../shared/types';
-import tools from '../shared/tools';
-import VisaAcceptanceAPI from '../shared/api';
+import { tools } from '../shared/tools';
+import { VisaAcceptanceAPI } from '../shared/api';
+import { maskPII } from '../shared/utils/util';
 
 class VisaAcceptanceAgentToolkit extends McpServer {
   private _visaAcceptanceAPI: VisaAcceptanceAPI;
@@ -57,25 +58,68 @@ class VisaAcceptanceAgentToolkit extends McpServer {
       };
       this._visaAcceptanceAPI = new VisaAcceptanceAPI(visaContext);
 
-    const filteredTools = tools(visaContext).filter((tool) =>
+    const filteredTools = tools(visaContext).filter((tool: any) =>
       isToolAllowed(tool, options.configuration || {})
     );
 
-    filteredTools.forEach((tool) => {
+    filteredTools.forEach((tool: any) => {
       this.tool(
         tool.method,
         tool.description,
         tool.parameters.shape,
         async (arg: any, _extra: RequestHandlerExtra<any, any>) => {
           const result = await this._visaAcceptanceAPI.run(tool.method, arg);
-          return {
-            content: [
-              {
-                type: 'text' as const,
-                text: String(result),
-              },
-            ],
-          };
+          try {
+            // Parse the JSON string to get the actual object
+            const parsedResult = JSON.parse(result);
+            
+            // Apply masking directly here for invoice-related operations
+            if (tool.method === 'list_invoices' && parsedResult.invoices && Array.isArray(parsedResult.invoices)) {
+              console.error('Applying masking to invoices in toolkit...');
+              
+              // Apply masking to each invoice's customer information
+              parsedResult.invoices.forEach((invoice: any) => {
+                if (invoice.customerInformation && invoice.customerInformation.name) {
+                  const originalName = invoice.customerInformation.name;
+                  invoice.customerInformation.name = maskPII(originalName, 'end');
+                  console.error(`Masked name: "${originalName}" -> "${invoice.customerInformation.name}"`);
+                }
+                
+                if (invoice.customerInformation && invoice.customerInformation.email) {
+                  const originalEmail = invoice.customerInformation.email;
+                  const emailParts = originalEmail.split('@');
+                  if (emailParts.length === 2) {
+                    const maskedLocalPart = maskPII(emailParts[0], 'end');
+                    invoice.customerInformation.email = `${maskedLocalPart}@${emailParts[1]}`;
+                  } else {
+                    invoice.customerInformation.email = maskPII(originalEmail, 'end');
+                  }
+                  console.error(`Masked email: "${originalEmail}" -> "${invoice.customerInformation.email}"`);
+                }
+              });
+            }
+            
+            // Then stringify it again to ensure proper formatting
+            return {
+              content: [
+                {
+                  type: 'text' as const,
+                  text: JSON.stringify(parsedResult, null, 2),
+                },
+              ],
+            };
+          } catch (error) {
+            // If parsing fails, return the original result
+            console.error('Failed to parse result:', error);
+            return {
+              content: [
+                {
+                  type: 'text' as const,
+                  text: String(result),
+                },
+              ],
+            };
+          }
         }
       );
     });

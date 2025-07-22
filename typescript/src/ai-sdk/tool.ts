@@ -13,7 +13,6 @@ import {z} from 'zod';
 import VisaAcceptanceAPI from '../shared/api';
 
 
-
 export default function VisaAcceptanceTool(
     visaAcceptanceAPI: VisaAcceptanceAPI,
     method: string,

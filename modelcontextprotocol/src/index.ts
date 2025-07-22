@@ -12,10 +12,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import dotenv from 'dotenv';
 import { green, yellow, red } from 'colors';
-import VisaAcceptanceAgentToolkit from '../../typescript/src/modelcontextprotocol/toolkit';
+// Use dynamic import for compatibility with both CJS and ESM
+const VisaAcceptanceAgentToolkit = require('../../typescript/modelcontextprotocol');
 
 dotenv.config();
-
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 /**
  * Main configuration type for the Visa Acceptance MCP server
  */

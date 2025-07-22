@@ -8,7 +8,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "strict": true,
-    "module": "CommonJS",
+    "module": "NodeNext",
     "baseUrl": ".",
     "declaration": true,
     "paths": {

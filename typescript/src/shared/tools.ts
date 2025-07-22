@@ -10,12 +10,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 import { z } from 'zod';
 import { VisaContext } from './types';
 
-import createInvoiceToolModule from './invoices/createInvoice';
-import updateInvoiceToolModule from './invoices/updateInvoice';
-import getInvoiceToolModule from './invoices/getInvoice';
-import listInvoicesToolModule from './invoices/listInvoices';
-import sendInvoiceToolModule from './invoices/sendInvoice';
-import cancelInvoiceToolModule from './invoices/cancelInvoice';
+// We need to update all the invoice and payment link files to use named exports
+// For now, let's use default imports until all files are updated
+import { createInvoiceToolModule } from './invoices/createInvoice';
+import { updateInvoiceToolModule } from './invoices/updateInvoice';
+import { getInvoiceToolModule } from './invoices/getInvoice';
+import { listInvoicesToolModule } from './invoices/listInvoices';
+import { sendInvoiceToolModule } from './invoices/sendInvoice';
+import { cancelInvoiceToolModule } from './invoices/cancelInvoice';
 import createPaymentLinkToolModule from './paymentLinks/createPaymentLink';
 import updatePaymentLinkToolModule from './paymentLinks/updatePaymentLink';
 import getPaymentLinkToolModule from './paymentLinks/getPaymentLink';
@@ -34,7 +36,8 @@ export type Tool = {
   execute: (visaClient: any, context: VisaContext, params: any) => Promise<any>;
 };
 
-export function tools(context: VisaContext): Tool[] {
+// Rename the function to avoid naming conflict with the export
+export function createTools(context: VisaContext): Tool[] {
   return [
     createInvoiceToolModule(context),
     updateInvoiceToolModule(context),
@@ -49,5 +52,6 @@ export function tools(context: VisaContext): Tool[] {
   ];
 }
 
-export default tools;
+// Export the function with an alias for compatibility
+export { createTools as tools };
 /* END GENAI */
