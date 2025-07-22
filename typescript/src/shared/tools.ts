@@ -12,12 +12,12 @@ import { VisaContext } from './types';
 
 // We need to update all the invoice and payment link files to use named exports
 // For now, let's use default imports until all files are updated
-import { createInvoiceToolModule } from './invoices/createInvoice';
-import { updateInvoiceToolModule } from './invoices/updateInvoice';
-import { getInvoiceToolModule } from './invoices/getInvoice';
-import { listInvoicesToolModule } from './invoices/listInvoices';
-import { sendInvoiceToolModule } from './invoices/sendInvoice';
-import { cancelInvoiceToolModule } from './invoices/cancelInvoice';
+import createInvoiceToolModule from './invoices/createInvoice';
+import updateInvoiceToolModule from './invoices/updateInvoice';
+import getInvoiceToolModule from './invoices/getInvoice';
+import listInvoicesToolModule from './invoices/listInvoices';
+import sendInvoiceToolModule from './invoices/sendInvoice';
+import cancelInvoiceToolModule from './invoices/cancelInvoice';
 import createPaymentLinkToolModule from './paymentLinks/createPaymentLink';
 import updatePaymentLinkToolModule from './paymentLinks/updatePaymentLink';
 import getPaymentLinkToolModule from './paymentLinks/getPaymentLink';
@@ -54,4 +54,6 @@ export function createTools(context: VisaContext): Tool[] {
 
 // Export the function with an alias for compatibility
 export { createTools as tools };
+
+export default createTools;
 /* END GENAI */

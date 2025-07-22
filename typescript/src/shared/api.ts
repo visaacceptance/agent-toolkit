@@ -89,4 +89,5 @@ class VisaAcceptanceAPI {
 }
 
 export default VisaAcceptanceAPI;
+export { VisaAcceptanceAPI };
 /* END GENAI */

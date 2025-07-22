@@ -9,11 +9,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 /* START GENAI */
 import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import {RequestHandlerExtra} from '@modelcontextprotocol/sdk/shared/protocol.js';
-import {Configuration, isToolAllowed} from '../shared/configuration';
-import { VisaContext } from '../shared/types';
-import { tools } from '../shared/tools';
-import { VisaAcceptanceAPI } from '../shared/api';
-import { maskPII } from '../shared/utils/util';
+import {Configuration, isToolAllowed} from '../shared/configuration.js';
+import { VisaContext } from '../shared/types.js';
+import { tools } from '../shared/tools.js';
+import VisaAcceptanceAPI from '../shared/api.js';
+import { maskPII } from '../shared/utils/util.js';
 
 class VisaAcceptanceAgentToolkit extends McpServer {
   private _visaAcceptanceAPI: VisaAcceptanceAPI;

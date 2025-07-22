@@ -2,7 +2,6 @@
   "name": "@visaacceptance/mcp",
   "version": "0.1.0",
   "description": "Visa Acceptance Agent Toolkit with MCP integration for payment services.",
-  "type": "commonjs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": "dist/index.js",
@@ -21,8 +20,7 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.11.0",
     "@types/dotenv": "^6.1.1",
-    "@visaacceptance/agent-toolkit": "^0.1.0",
-    "@visaacceptance/test-agent-toolkit": "npm:@visaacceptance/agent-toolkit@^0.1.0",
+    "@visaacceptance/agent-toolkit": "file:../typescript",
     "colors": "^1.4.0",
     "dotenv": "^16.5.0"
   },

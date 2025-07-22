@@ -3,8 +3,8 @@
 // Load environment variables first, before any access to process.env
 require('dotenv').config();
 import { green, yellow, red } from 'colors';
-import { VisaAcceptanceAgentToolkit } from '@visaacceptance/test-agent-toolkit/ai-sdk';
-import { createOpenAI } from '@ai-sdk/openai';
+import { VisaAcceptanceAgentToolkit } from '@visaacceptance/agent-toolkit/ai-sdk';
+import { openai } from '@ai-sdk/openai';
 import { generateText } from 'ai';
 
 export interface ChatCompletionTool {
@@ -17,11 +17,7 @@ export interface ChatCompletionTool {
   };
 }
 
-const openai = createOpenAI({
-  compatibility: 'strict',
-  baseURL: process.env.OPENAI_API_BASE_URL,
-  apiKey: process.env.OPENAI_API_KEY
-});
+
 
 
 const configuration = {

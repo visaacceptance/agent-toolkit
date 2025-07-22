@@ -9,14 +9,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
  */
 /* START GENAI */
 
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import dotenv from 'dotenv';
-import { green, yellow, red } from 'colors';
-// Use dynamic import for compatibility with both CJS and ESM
-const VisaAcceptanceAgentToolkit = require('../../typescript/modelcontextprotocol');
+const { StdioServerTransport } = require('@modelcontextprotocol/sdk/server/stdio.js');
+const dotenv = require('dotenv');
+const colors = require('colors');
+const { green, yellow, red } = colors;
+// Import from the typescript package dependency
+const { default: VisaAcceptanceAgentToolkit } = require('@visaacceptance/agent-toolkit/modelcontextprotocol');
 
 dotenv.config();
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 /**
  * Main configuration type for the Visa Acceptance MCP server
  */
@@ -165,9 +165,11 @@ export async function main(): Promise<void> {
   }
 }
 
+
 if (require.main === module) {
   main().catch((error) => {
     handleError(error);
   });
 }
+
 /* END GENAI */

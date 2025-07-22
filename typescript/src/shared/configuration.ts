@@ -118,7 +118,7 @@ export function getVisaAcceptanceConfig(context: VisaContext) {
       logFileName: 'vap.log',
       logDirectory:  'vap',
       logFileMaxSize: '5242880',
-      loggingLevel:  'info',
+      loggingLevel:  'error',
       enableMasking: true,
     }
     /* END GENAI */

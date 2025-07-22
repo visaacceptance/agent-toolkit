@@ -26,7 +26,6 @@ export function setDeveloperId(requestObj: any, context: VisaContext): any {
   if (!requestObj.clientReferenceInformation.partner) {
     requestObj.clientReferenceInformation.partner = {};
   }
-  console.error(context);
   // Set the developer ID based on the context mode
   requestObj.clientReferenceInformation.partner.developerId = 
     context?.mode === 'modelcontextprotocol' ? 'N05YN5UH' : 'A2R8EP3K';
