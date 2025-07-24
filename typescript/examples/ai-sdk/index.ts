@@ -1,22 +1,10 @@
-/* START GENAI */
+
 
 // Load environment variables first, before any access to process.env
 require('dotenv').config();
-import { green, yellow, red } from 'colors';
 import { VisaAcceptanceAgentToolkit } from '@visaacceptance/agent-toolkit/ai-sdk';
 import { openai } from '@ai-sdk/openai';
 import { generateText } from 'ai';
-
-export interface ChatCompletionTool {
-  description: string;
-  parameters: {
-    type: string;
-    properties: Record<string, { type: string; description: string }>;
-    required: string[];
-    additionalProperties?: boolean;
-  };
-}
-
 
 
 
@@ -52,4 +40,3 @@ async function aiGeneratedPaymentLink() {
 }
 
 aiGeneratedPaymentLink();
-/* END GENAI */
