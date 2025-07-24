@@ -23,9 +23,9 @@ The library needs to be configured with your account's credentials which are ava
 import {VisaAcceptanceAgentToolkit} from '@visaacceptance/agent-toolkit/ai-sdk';
 
 const visaAcceptanceAgentToolkit = new VisaAcceptanceAgentToolkit({
-  merchantId: process.env.MERCHANT_ID!,
-  apiKeyId: process.env.API_KEY_ID!,
-  secretKey: process.env.SECRET_KEY!,
+  merchantId: process.env.MERCHANT_ID,
+  apiKeyId: process.env.API_KEY_ID,
+  secretKey: process.env.SECRET_KEY,
   configuration: {
     actions: {
       invoices: {
@@ -64,9 +64,9 @@ In some cases you will want to provide values that serve as defaults when making
 
 ```typescript
 const visaAcceptanceAgentToolkit = new VisaAcceptanceAgentToolkit({
-  merchantId: process.env.MERCHANT_ID!,
-  apiKeyId: process.env.API_KEY_ID!,
-  secretKey: process.env.SECRET_KEY!,
+  merchantId: process.env.MERCHANT_ID,
+  apiKeyId: process.env.API_KEY_ID,
+  secretKey: process.env.SECRET_KEY,
   configuration: {
     context: {
       environment: 'SANDBOX', // or 'PRODUCTION'
@@ -74,47 +74,6 @@ const visaAcceptanceAgentToolkit = new VisaAcceptanceAgentToolkit({
   },
 });
 ```
-
-### Metered billing
-
-For Vercel's AI SDK, you can use middleware to submit billing events for usage. All that is required is the customer ID and the input/output meters to bill.
-
-```typescript
-import {VisaAcceptanceAgentToolkit} from '@visaacceptance/agent-toolkit/ai-sdk';
-import {openai} from '@ai-sdk/openai';
-import {
-  generateText,
-  experimental_wrapLanguageModel as wrapLanguageModel,
-} from 'ai';
-
-const visaAcceptanceAgentToolkit = new VisaAcceptanceAgentToolkit({
-  merchantId: process.env.MERCHANT_ID!,
-  apiKeyId: process.env.API_KEY_ID!,
-  secretKey: process.env.SECRET_KEY!,
-  configuration: {
-    actions: {
-      invoices: {
-        create: true,
-      },
-    },
-  },
-});
-
-const model = wrapLanguageModel({
-  model: openai('gpt-4o'),
-  middleware: visaAcceptanceAgentToolkit.middleware({
-    billing: {
-      customer: 'cus_123',
-      meters: {
-        input: 'input_tokens',
-        output: 'output_tokens',
-      },
-    },
-  }),
-});
-```
-
-This works with both `generateText` and `generateStream` from the Vercel AI SDK.
 
 ### Invoice Creation Example
 
@@ -126,9 +85,9 @@ import {openai} from '@ai-sdk/openai';
 import {generateText} from 'ai';
 
 const visaAcceptanceAgentToolkit = new VisaAcceptanceAgentToolkit({
-  merchantId: process.env.MERCHANT_ID!,
-  apiKeyId: process.env.API_KEY_ID!,
-  secretKey: process.env.SECRET_KEY!,
+  merchantId: process.env.VISA_ACCEPTANCE_MERCHANT_ID,
+  apiKeyId: process.env.VISA_ACCEPTANCE_API_KEY_ID,
+  secretKey: process.env.VISA_ACCEPTANCE_SECRET_KEY,
   configuration: {
     actions: {
       invoices: {
@@ -160,9 +119,9 @@ import {VisaAcceptanceAgentToolkit} from '@visaacceptance/agent-toolkit/modelcon
 import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
 
 const server = new VisaAcceptanceAgentToolkit({
-  merchantId: process.env.MERCHANT_ID!,
-  apiKeyId: process.env.API_KEY_ID!,
-  secretKey: process.env.SECRET_KEY!,
+  merchantId: process.env.MERCHANT_ID,
+  apiKeyId: process.env.API_KEY_ID,
+  secretKey: process.env.SECRET_KEY,
   configuration: {
     actions: {
       invoices: {
@@ -195,5 +154,3 @@ Configuration is loaded from environment variables with fallbacks to default val
 - `VISA_ACCEPTANCE_API_KEY_ID` - Your Visa Acceptance API key ID
 - `VISA_ACCEPTANCE_SECRET_KEY` - Your Visa Acceptance secret key
 - `VISA_ACCEPTANCE_ENVIRONMENT` - SANDBOX and PRODUCTION are available environments
-
-Note: Both the new simplified names (MERCHANT_ID, API_KEY_ID, SECRET_KEY) and the old names (VISA_ACCEPTANCE_*) are supported for backward compatibility. The new simplified names take precedence if both are defined.

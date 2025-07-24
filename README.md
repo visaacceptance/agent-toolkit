@@ -22,15 +22,15 @@ npm install @visaacceptance/agent-toolkit
 
 ### Usage
 
-Configure the toolkit with your Visa Acceptance account credentials. These credentials can be set using environment variables (`MERCHANT_ID`, `API_KEY_ID`, `SECRET_KEY`) or legacy naming conventions (`VISA_ACCEPTANCE_MERCHANT_ID`, `VISA_ACCEPTANCE_API_KEY_ID`, `VISA_ACCEPTANCE_SECRET_KEY`).
+Configure the toolkit with your Visa Acceptance account credentials. These credentials can be set using environment variables (`MERCHANT_ID`, `API_KEY_ID`, `SECRET_KEY`).
 
 ```typescript
 import { VisaAcceptanceAgentToolkit } from "@visaacceptance/agent-toolkit/ai-sdk";
 
 const toolkit = new VisaAcceptanceAgentToolkit({
-  merchantId: process.env.MERCHANT_ID!,
-  apiKeyId: process.env.API_KEY_ID!,
-  secretKey: process.env.SECRET_KEY!,
+  merchantId: process.env.VISA_ACCEPTANCE_MERCHANT_ID,
+  apiKeyId: process.env.VISA_ACCEPTANCE_API_KEY_ID,
+  secretKey: process.env.VISA_ACCEPTANCE_SECRET_KEY,
   configuration: {
     actions: {
       invoices: {
@@ -61,9 +61,9 @@ import { AI } from "@vercel/ai";
 import { VisaAcceptanceAgentToolkit } from "@visaacceptance/agent-toolkit/ai-sdk";
 
 const toolkit = new VisaAcceptanceAgentToolkit({
-  merchantId: process.env.MERCHANT_ID!,
-  apiKeyId: process.env.API_KEY_ID!,
-  secretKey: process.env.SECRET_KEY!,
+  merchantId: process.env.MERCHANT_ID,
+  apiKeyId: process.env.API_KEY_ID,
+  secretKey: process.env.SECRET_KEY,
   configuration: {
     actions: {
       invoices: {
@@ -89,9 +89,9 @@ You can set default behaviors or environments via the `configuration.context` bl
 
 ```typescript
 const toolkit = new VisaAcceptanceAgentToolkit({
-  merchantId: process.env.MERCHANT_ID!,
-  apiKeyId: process.env.API_KEY_ID!,
-  secretKey: process.env.SECRET_KEY!,
+  merchantId: process.env.MERCHANT_ID,
+  apiKeyId: process.env.API_KEY_ID,
+  secretKey: process.env.SECRET_KEY,
   configuration: {
     context: {
       environment: "SANDBOX",
