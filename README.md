@@ -131,6 +131,13 @@ The toolkit currently provides the following Visa Acceptance operations:
 ## DISCLAIMER
 AI-generated content may be inaccurate or incomplete. Users are fully responsible for verifying any information before relying on it, especially for financial decisions. Visa Acceptance is not liable for any usage, decisions, or damages resulting from AI outputs or this toolkit.
 
+### Agent Toolkit Disclaimer
+The Agent Toolkit is a SDK provided as a developer tool to facilitate integration of select Visa APIs with large language models (LLMs) or AI services used or accessed by Agent Toolkit licensees. No LLMs or AI services are provided or delivered by Visa through the Agent Toolkit. Licensees of the Agent Toolkit are solely responsible for selecting, procuring, licensing or otherwise obtaining access to, configuring, and maintaining their own LLMs, AI services, and data sources.
+
+### MCP Server Disclaimer
+This  Model Context Protocol (MCP) server is  provided in conjunction with the Agent Toolkit SDK to facilitate integration of select Visa APIs with large language models (LLMs) or AI services used or accessed by Agent Toolkit licensees. No LLMs or AI services are provided or delivered by Visa through the MCP server or Agent Toolkit. Licensees of the Agent Toolkit are solely responsible for selecting, procuring, licensing or otherwise obtaining access to, configuring, and maintaining their own LLMs, AI services, and data sources.
+
+
 ## License
 
 MIT
