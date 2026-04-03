@@ -6,13 +6,11 @@
     "noImplicitAny": false
   },
   "include": [
-    "./**/*.ts",
-    "../../src/**/*.ts"
+    "./**/*.ts"
   ],
   "exclude": [
     "node_modules",
     "dist"
   ],
-  "extends": "../../tsconfig.json",
-
+  "extends": "../../tsconfig.json"
 }

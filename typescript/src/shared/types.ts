@@ -17,21 +17,17 @@ export interface VisaContext {
   mode?: string;
 }
 
-
 export interface Configuration {
   actions?: {
     invoices?: {
       create?: boolean;
       read?: boolean;
       update?: boolean;
-      list?: boolean;
-      get?: boolean;
     };
     paymentLinks?: {
       create?: boolean;
       read?: boolean;
       update?: boolean;
-      list?: boolean;
     };
   };
   context?: {

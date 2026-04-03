@@ -9,11 +9,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import {RequestHandlerExtra} from '@modelcontextprotocol/sdk/shared/protocol.js';
-import {Configuration, isToolAllowed} from '../shared/configuration.js';
-import { VisaContext } from '../shared/types.js';
-import { tools } from '../shared/tools.js';
-import VisaAcceptanceAPI from '../shared/api.js';
-import { maskPII } from '../shared/utils/util.js';
+import {Configuration, isToolAllowed} from '../shared/configuration';
+import { VisaContext } from '../shared/types';
+import tools from '../shared/tools';
+import VisaAcceptanceAPI from '../shared/api';
 
 class VisaAcceptanceAgentToolkit extends McpServer {
   private _visaAcceptanceAPI: VisaAcceptanceAPI;
@@ -33,14 +32,7 @@ class VisaAcceptanceAgentToolkit extends McpServer {
    
     super({
         name: 'Visa Acceptance',
-        version: '0.1.0',
-        configuration: {
-          ...(options.configuration || {}),
-          context: {
-            ...(options.configuration?.context || {}),
-            mode: 'modelcontextprotocol',
-          },
-        },
+        version: '0.1.1',
       });
       
       this.credentials = {
@@ -53,73 +45,30 @@ class VisaAcceptanceAgentToolkit extends McpServer {
         merchantId: this.credentials.merchantId || '',
         apiKeyId: this.credentials.merchantKeyId || '',
         secretKey: this.credentials.secretKey || '',
-        environment: options.environment || 'SANDBOX',
-        mode: 'modelcontextprotocol'
+        environment: options.environment || 'SANDBOX'
       };
       this._visaAcceptanceAPI = new VisaAcceptanceAPI(visaContext);
 
-    const filteredTools = tools(visaContext).filter((tool: any) =>
+    const context = (options.configuration?.context) || {};
+    const filteredTools = tools(visaContext).filter((tool) =>
       isToolAllowed(tool, options.configuration || {})
     );
 
-    filteredTools.forEach((tool: any) => {
+    filteredTools.forEach((tool) => {
       this.tool(
         tool.method,
         tool.description,
         tool.parameters.shape,
         async (arg: any, _extra: RequestHandlerExtra<any, any>) => {
           const result = await this._visaAcceptanceAPI.run(tool.method, arg);
-          try {
-            // Parse the JSON string to get the actual object
-            const parsedResult = JSON.parse(result);
-            
-            // Apply masking directly here for invoice-related operations
-            if (tool.method === 'list_invoices' && parsedResult.invoices && Array.isArray(parsedResult.invoices)) {
-              console.error('Applying masking to invoices in toolkit...');
-              
-              // Apply masking to each invoice's customer information
-              parsedResult.invoices.forEach((invoice: any) => {
-                if (invoice.customerInformation && invoice.customerInformation.name) {
-                  const originalName = invoice.customerInformation.name;
-                  invoice.customerInformation.name = maskPII(originalName, 'end');
-                  console.error(`Masked name: "${originalName}" -> "${invoice.customerInformation.name}"`);
-                }
-                
-                if (invoice.customerInformation && invoice.customerInformation.email) {
-                  const originalEmail = invoice.customerInformation.email;
-                  const emailParts = originalEmail.split('@');
-                  if (emailParts.length === 2) {
-                    const maskedLocalPart = maskPII(emailParts[0], 'end');
-                    invoice.customerInformation.email = `${maskedLocalPart}@${emailParts[1]}`;
-                  } else {
-                    invoice.customerInformation.email = maskPII(originalEmail, 'end');
-                  }
-                  console.error(`Masked email: "${originalEmail}" -> "${invoice.customerInformation.email}"`);
-                }
-              });
-            }
-            
-            // Then stringify it again to ensure proper formatting
-            return {
-              content: [
-                {
-                  type: 'text' as const,
-                  text: JSON.stringify(parsedResult, null, 2),
-                },
-              ],
-            };
-          } catch (error) {
-            // If parsing fails, return the original result
-            console.error('Failed to parse result:', error);
-            return {
-              content: [
-                {
-                  type: 'text' as const,
-                  text: String(result),
-                },
-              ],
-            };
-          }
+          return {
+            content: [
+              {
+                type: 'text' as const,
+                text: String(result),
+              },
+            ],
+          };
         }
       );
     });

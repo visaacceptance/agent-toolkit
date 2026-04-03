@@ -11,7 +11,7 @@ import { z } from 'zod';
 import { Tool } from '../tools';
 import { VisaContext } from '../types';
 import { Context } from '../configuration';
-import { maskInvoicesCustomerInfo } from '../utils/util';
+import { maskInvoicesCustomerInfo } from '../utils/masking';
 const cybersourceRestApi = require('cybersource-rest-client');
 
 export const listInvoicesParameters = (
@@ -82,4 +82,3 @@ const tool = (context: VisaContext): Tool => ({
 });
 
 export default tool;
-

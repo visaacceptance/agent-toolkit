@@ -10,8 +10,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 import { z } from 'zod';
 import { VisaContext } from './types';
 
-// We need to update all the invoice and payment link files to use named exports
-// For now, let's use default imports until all files are updated
 import createInvoiceToolModule from './invoices/createInvoice';
 import updateInvoiceToolModule from './invoices/updateInvoice';
 import getInvoiceToolModule from './invoices/getInvoice';
@@ -36,8 +34,7 @@ export type Tool = {
   execute: (visaClient: any, context: VisaContext, params: any) => Promise<any>;
 };
 
-// Rename the function to avoid naming conflict with the export
-export function createTools(context: VisaContext): Tool[] {
+export function tools(context: VisaContext): Tool[] {
   return [
     createInvoiceToolModule(context),
     updateInvoiceToolModule(context),
@@ -52,7 +49,4 @@ export function createTools(context: VisaContext): Tool[] {
   ];
 }
 
-// Export the function with an alias for compatibility
-export { createTools as tools };
-
-export default createTools;
+export default tools;

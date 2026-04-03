@@ -11,7 +11,7 @@ import { z } from 'zod';
 import { Tool } from '../tools';
 import { VisaContext } from '../types';
 import { Context } from '../configuration';
-import { maskPII } from '../utils/util';
+import { maskPII } from '../utils/masking';
 const cybersourceRestApi = require('cybersource-rest-client');
 
 export const listPaymentLinksParameters = (
@@ -25,7 +25,7 @@ export const listPaymentLinksParameters = (
 };
 
 export const listPaymentLinksPrompt = (context: VisaContext = {} as VisaContext) => `
-This tool will list payment links from Visa Acceptance.
+This tool will list payment links with optional filtering by status from Visa Acceptance.
 `;
 
 export const listPaymentLinks = async (

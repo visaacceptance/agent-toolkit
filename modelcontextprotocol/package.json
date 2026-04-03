@@ -1,13 +1,14 @@
 {
   "name": "@visaacceptance/mcp",
-  "version": "0.0.94",
+  "version": "0.1.1",
   "description": "Visa Acceptance Agent Toolkit with MCP integration for payment services.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "bin": "dist/index.js",
+  "type": "commonjs",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "bin": "dist/src/index.js",
   "scripts": {
-    "build": "tsc && node -e \"require('fs').chmodSync('dist/index.js', '755')\"",
-    "start": "node dist/index.js",
+    "build": "tsc",
+    "start": "node dist/src/index.js",
     "dev": "nodemon --exec ts-node src/index.ts",
     "lint": "eslint . --ext .ts,.js",
     "demo": "node dist/demo-server.js",
@@ -15,12 +16,12 @@
     "watch": "tsc --watch",
     "test:integration": "ts-node integration-test.ts",
     "prepare": "npm run build",
-    "link": "npm link"
+    "link": "npm link @visaacceptance/agent-toolkit"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.11.0",
     "@types/dotenv": "^6.1.1",
-    "@visaacceptance/agent-toolkit": "^0.0.94",
+    "@visaacceptance/agent-toolkit": "0.1.1",
     "colors": "^1.4.0",
     "dotenv": "^16.5.0"
   },
@@ -51,13 +52,14 @@
   "files": [
     "dist/index.js",
     "dist/index.d.ts",
-    "dist/**/*.js",
-    "dist/**/*.d.ts",
+    "dist/config.d.ts",
+    "dist/src/**/*.js",
+    "dist/src/**/*.d.ts",
     "README.md",
     "LICENSE"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/visaacceptance/agent-toolkit"
+    "url": "https://github.com/visa-acceptance/agent-toolkit"
   }
 }

@@ -2,10 +2,6 @@
 
 The Visa Acceptance Agent Toolkit seamlessly integrates with Vercel's AI SDK and the Model Context Protocol (MCP) for Visa Acceptance APIs. It offers a specialized set of tools designed to help you manage invoices, create payment links, and perform other Visa Acceptance-related operations.
 
-## Supported Frameworks
-
-- **Vercel AI SDK** - Full integration with function calling and tool support
-- **Model Context Protocol (MCP)** - Complete MCP server implementation
 ## TypeScript
 
 ### Installation
@@ -20,112 +16,108 @@ npm install @visaacceptance/agent-toolkit
 
 - Node 18+
 
-### Usage
+### Local Development
 
-Configure the toolkit with your Visa Acceptance account credentials. These credentials can be set using environment variables (`MERCHANT_ID`, `API_KEY_ID`, `SECRET_KEY`).
+This repository contains multiple packages:
+- **@visaacceptance/agent-toolkit** (`typescript/`): The core toolkit library
+- **@visaacceptance/mcp** (`modelcontextprotocol/`): MCP server implementation (depends on @visaacceptance/agent-toolkit)
+- **visa-acceptance-agent-toolkit-ai-sdk-example** (`typescript/examples/ai-sdk/`): Example implementation (depends on @visaacceptance/agent-toolkit)
 
-```typescript
-import { VisaAcceptanceAgentToolkit } from "@visaacceptance/agent-toolkit/ai-sdk";
+For local development, use npm linking to connect these packages:
 
-const toolkit = new VisaAcceptanceAgentToolkit({
-  merchantId: process.env.VISA_ACCEPTANCE_MERCHANT_ID,
-  apiKeyId: process.env.VISA_ACCEPTANCE_API_KEY_ID,
-  secretKey: process.env.VISA_ACCEPTANCE_SECRET_KEY,
-  configuration: {
-    actions: {
-      invoices: {
-        create: true,
-        update: true,
-        list: true,
-        get: true,
-        send: true,
-        cancel: true
-      },
-      paymentLinks: {
-        create: true,
-        update: true,
-        list: true,
-        get: true,
-      },
-    },
-  },
-});
-```
+1. **Link the agent-toolkit**:
+   ```bash
+   cd typescript
+   npm install
+   npm run build
+   npm run link
+   ```
+
+2. **Link dependent packages**:
+   ```bash
+   # For @visaacceptance/mcp
+   cd ../modelcontextprotocol
+   npm install
+   npm run link
+   npm run build
+
+   # For ai-sdk example
+   cd ../typescript/examples/ai-sdk
+   npm install
+   npm run link
+   ```
+
+Now changes to the agent-toolkit will be immediately available in the dependent packages after rebuilding.
+
+### Credentials
+
+Configure the toolkit with your Visa Acceptance account credentials. These credentials can be set using environment variables (`VISA_ACCEPTANCE_MERCHANT_ID`, `VISA_ACCEPTANCE_API_KEY_ID`, `VISA_ACCEPTANCE_SECRET_KEY`).
 
 ### Integrating with Vercel's AI SDK
 
 To use this toolkit with Vercel's AI SDK:
 
 ```typescript
-import { AI } from "@vercel/ai";
 import { VisaAcceptanceAgentToolkit } from "@visaacceptance/agent-toolkit/ai-sdk";
+import { createOpenAI } from "@ai-sdk/openai";
+import { generateText } from "ai";
 
-const toolkit = new VisaAcceptanceAgentToolkit({
-  merchantId: process.env.MERCHANT_ID,
-  apiKeyId: process.env.API_KEY_ID,
-  secretKey: process.env.SECRET_KEY,
-  configuration: {
+const openai = createOpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+const toolkit = new VisaAcceptanceAgentToolkit(
+  process.env.VISA_ACCEPTANCE_MERCHANT_ID,
+  process.env.VISA_ACCEPTANCE_API_KEY_ID,
+  process.env.VISA_ACCEPTANCE_SECRET_KEY,
+  "SANDBOX", // or "PRODUCTION"
+  {
     actions: {
       invoices: {
         create: true,
-      }
+      },
     },
-  },
-});
-
-const ai = new AI({
-  tools: toolkit.getTools(),
-});
+  }
+);
 
 // Sample usage:
-const response = await ai.run({
-  messages: [{ role: "user", content: "Please create an invoice for $200" }],
+const result = await generateText({
+  model: openai("gpt-4o"),
+  tools: toolkit.getTools(),
+  prompt: "Please create an invoice for $200",
 });
 ```
 
-### Context
+**Important:** Always test in `SANDBOX` before switching to `PRODUCTION`.
 
-You can set default behaviors or environments via the `configuration.context` block. For example, enabling test environments:
+### Integrating with MCP
 
-```typescript
-const toolkit = new VisaAcceptanceAgentToolkit({
-  merchantId: process.env.MERCHANT_ID,
-  apiKeyId: process.env.API_KEY_ID,
-  secretKey: process.env.SECRET_KEY,
-  configuration: {
-    context: {
-      environment: "SANDBOX",
-    },
-  },
-});
-```
-
-## Model Context Protocol
-
-The [Model Context Protocol (MCP)](https://modelcontextprotocol.com/) is also supported. You can run a Visa Acceptance MCP server with:
+The [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) is also supported. You can run a Visa Acceptance MCP server with:
 
 ```bash
 npx -y @visaacceptance/mcp --tools=all --merchant-id=YOUR_MERCHANT_ID --api-key-id=YOUR_API_KEY_ID --secret-key=YOUR_SECRET_KEY
 ```
 
+For additional setup information and configuration options, see the [MCP documentation](modelcontextprotocol/README.md).
 
-## Supported API Methods
+
+## Supported Tools
 
 The toolkit currently provides the following Visa Acceptance operations:
 
-- **Invoices**
-  - Create an invoice - Create a new invoice with customer information and enhanced parameters
-  - Update an invoice - Update existing invoice details including customer and invoice information
-  - List invoices - Retrieve paginated list of invoices with filtering options
-  - Get invoice - Retrieve detailed information for a specific invoice
-  - Send invoice - Send invoice to customer via email
-  - Cancel invoice - Cancel an existing invoice
+- **Invoices**  
+  - `create_invoice` - Create a new invoice with customer information and payment details
+  - `update_invoice` - Update an existing invoice including customer and invoice information
+  - `get_invoice` - Retrieve detailed information about a specific invoice
+  - `list_invoices` - List invoices with pagination support
+  - `send_invoice` - Send an invoice to the customer via email
+  - `cancel_invoice` - Cancel an existing invoice
 
-- **Payment Links**
-  - Create a payment link - Create a new payment link with optional shipping information
-  - Update a payment link - Update existing payment link details
-  - List payment links - Retrieve paginated list of payment links
-  - Get payment link - Retrieve details of a specific payment link
+- **Payment Links**  
+  - `create_payment_link` - Create a new payment link with customizable line items and payment options
+  - `update_payment_link` - Update an existing payment link by its ID
+  - `get_payment_link` - Retrieve details of a specific payment link
+  - `list_payment_links` - List payment links with pagination support
 
 
 ## DISCLAIMER
@@ -135,7 +127,7 @@ AI-generated content may be inaccurate or incomplete. Users are fully responsibl
 The Agent Toolkit is a SDK provided as a developer tool to facilitate integration of select Visa APIs with large language models (LLMs) or AI services used or accessed by Agent Toolkit licensees. No LLMs or AI services are provided or delivered by Visa through the Agent Toolkit. Licensees of the Agent Toolkit are solely responsible for selecting, procuring, licensing or otherwise obtaining access to, configuring, and maintaining their own LLMs, AI services, and data sources.
 
 ### MCP Server Disclaimer
-This  Model Context Protocol (MCP) server is  provided in conjunction with the Agent Toolkit SDK to facilitate integration of select Visa APIs with large language models (LLMs) or AI services used or accessed by Agent Toolkit licensees. No LLMs or AI services are provided or delivered by Visa through the MCP server or Agent Toolkit. Licensees of the Agent Toolkit are solely responsible for selecting, procuring, licensing or otherwise obtaining access to, configuring, and maintaining their own LLMs, AI services, and data sources.
+This Model Context Protocol (MCP) server is  provided in conjunction with the Agent Toolkit SDK to facilitate integration of select Visa APIs with large language models (LLMs) or AI services used or accessed by Agent Toolkit licensees. No LLMs or AI services are provided or delivered by Visa through the MCP server or Agent Toolkit. Licensees of the Agent Toolkit are solely responsible for selecting, procuring, licensing or otherwise obtaining access to, configuring, and maintaining their own LLMs, AI services, and data sources.
 
 
 ## License

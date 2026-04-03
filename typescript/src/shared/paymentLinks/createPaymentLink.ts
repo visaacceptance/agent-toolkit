@@ -11,7 +11,7 @@ import { z } from 'zod';
 import { Tool } from '../tools';
 import { VisaContext } from '../types';
 import { Context } from '../configuration';
-import { setDeveloperId } from '../utils/util';
+import { setDeveloperId } from '../utils/developerUtils';
 const cybersourceRestApi = require('cybersource-rest-client');
 
 /**
@@ -30,7 +30,7 @@ export const createPaymentLinkParameters = (
 ) => {
   return z.object({
     linkType: z.string().describe('Type of payment link (PURCHASE OR DONATION)'),
-    purchaseNumber: z.string().describe('Unique alphanumeric id, no special chararacters for the purchase less than 20 characters'),
+    purchaseNumber: z.string().describe('Unique alphanumeric id, no special characters for the purchase less than 20 characters'),
     currency: z.string().describe('Currency code e.g. "USD" (Required)'),
     totalAmount: z.string().optional().describe('Total payment amount e.g. "100.00"'),
     requestPhone: z.boolean().optional().default(false).describe('Request phone number from customer'),

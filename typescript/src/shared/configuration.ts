@@ -95,9 +95,9 @@ export function getVisaAcceptanceConfig(context: VisaContext) {
     runEnvironment: process.env.VISA_ACCEPTANCE_ENVIRONMENT === 'SANDBOX' ? 'apitest.cybersource.com' : 'api.cybersource.com',
     
     /**
-     * Merchant credentials 
+     * Merchant credentials
      */
-    merchantID: process.env.VISA_ACCEPTANCE_MERCHANT_ID ||  context.merchantId ||'',
+    merchantID: process.env.VISA_ACCEPTANCE_MERCHANT_ID || context.merchantId || '',
     merchantKeyId: process.env.VISA_ACCEPTANCE_API_KEY_ID || context.apiKeyId || '',
     merchantsecretKey: process.env.VISA_ACCEPTANCE_SECRET_KEY || context.secretKey || '',
     
@@ -105,23 +105,24 @@ export function getVisaAcceptanceConfig(context: VisaContext) {
     keyPass: process.env.KEY_PASS,
     keyFileName: process.env.KEY_FILENAME,
     keysDirectory: process.env.KEYS_DIRECTORY || 'Resource',
+
+    disableSSLVerification: process.env.NODE_TLS_REJECT_UNAUTHORIZED === '0',
     
     useMetaKey: process.env.USE_META_KEY === 'true' || false,
     portfolioID: process.env.PORTFOLIO_ID,
     
     pemFileDirectory: process.env.PEM_FILE_DIRECTORY,
     
-    defaultDeveloperId: context.mode === 'modelcontextprotocol' ? 'N05YN5UH' : 'A2R8EP3K',
+    defaultDeveloperId: process.env.DEFAULT_DEVELOPER_ID || (context.mode === 'modelcontextprotocol' ? 'N05YN5UH' : 'A2R8EP3K'),
     
     logConfiguration: {
       enableLog: false,
-      logFileName: 'vap.log',
-      logDirectory:  'vap',
+      logFileName: '',
+      logDirectory:  './log',
       logFileMaxSize: '5242880',
-      loggingLevel:  'error',
+      loggingLevel:  'info',
       enableMasking: true,
     }
-    
   };
   
   if (!config.merchantID) {

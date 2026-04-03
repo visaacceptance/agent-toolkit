@@ -15,28 +15,32 @@ npm install @visaacceptance/agent-toolkit
 
 - Node 18+
 
-## Usage
+### Local Development
 
-The library needs to be configured with your account's credentials which are available in your Visa Acceptance Dashboard. Additionally, `configuration` enables you to specify the types of actions that can be taken using the toolkit.
+For local development setup and package linking instructions, see the [Local Development](https://github.com/visaacceptance/agent-toolkit/blob/main/README.md#local-development) section in the root README.
+
+## AI-SDK Usage
+
+The library needs to be configured with your account's credentials which are available in your Visa Acceptance Dashboard. Additionally, the `configuration` parameter enables you to specify the types of actions that can be taken using the toolkit.
 
 ```typescript
 import {VisaAcceptanceAgentToolkit} from '@visaacceptance/agent-toolkit/ai-sdk';
 
-const visaAcceptanceAgentToolkit = new VisaAcceptanceAgentToolkit({
-  merchantId: process.env.MERCHANT_ID,
-  apiKeyId: process.env.API_KEY_ID,
-  secretKey: process.env.SECRET_KEY,
-  configuration: {
+const visaAcceptanceAgentToolkit = new VisaAcceptanceAgentToolkit(
+  process.env.VISA_ACCEPTANCE_MERCHANT_ID,
+  process.env.VISA_ACCEPTANCE_API_KEY_ID,
+  process.env.VISA_ACCEPTANCE_SECRET_KEY,
+  'SANDBOX', // or 'PRODUCTION'
+  {
     actions: {
       invoices: {
         create: true,
+        read: true,
         update: true,
-        list: true,
-        get: true,
       },
     },
-  },
-});
+  }
+);
 ```
 
 ### Tools
@@ -44,34 +48,20 @@ const visaAcceptanceAgentToolkit = new VisaAcceptanceAgentToolkit({
 The toolkit works with Vercel's AI SDK and can be passed as a list of tools. For example:
 
 ```typescript
-import {AI} from '@vercel/ai';
+import { createOpenAI } from '@ai-sdk/openai';
+import { generateText } from 'ai';
+
+const openai = createOpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 const tools = visaAcceptanceAgentToolkit.getTools();
 
-const ai = new AI({
-  tools,
-});
-
 // Use the tools with Vercel AI SDK
-const response = await ai.run({
-  messages: [{ role: 'user', content: 'Create an invoice for $100 for customer John Doe' }],
-});
-```
-
-#### Context
-
-In some cases you will want to provide values that serve as defaults when making requests. Currently, the environment context value enables you to switch between test and production environments.
-
-```typescript
-const visaAcceptanceAgentToolkit = new VisaAcceptanceAgentToolkit({
-  merchantId: process.env.MERCHANT_ID,
-  apiKeyId: process.env.API_KEY_ID,
-  secretKey: process.env.SECRET_KEY,
-  configuration: {
-    context: {
-      environment: 'SANDBOX', // or 'PRODUCTION'
-    },
-  },
+const result = await generateText({
+  model: openai('gpt-4o'),
+  tools,
+  prompt: 'Create an invoice for $100 for customer John Doe',
 });
 ```
 
@@ -84,51 +74,49 @@ import {VisaAcceptanceAgentToolkit} from '@visaacceptance/agent-toolkit/ai-sdk';
 import {openai} from '@ai-sdk/openai';
 import {generateText} from 'ai';
 
-const visaAcceptanceAgentToolkit = new VisaAcceptanceAgentToolkit({
-  merchantId: process.env.VISA_ACCEPTANCE_MERCHANT_ID,
-  apiKeyId: process.env.VISA_ACCEPTANCE_API_KEY_ID,
-  secretKey: process.env.VISA_ACCEPTANCE_SECRET_KEY,
-  configuration: {
+const visaAcceptanceAgentToolkit = new VisaAcceptanceAgentToolkit(
+  process.env.VISA_ACCEPTANCE_MERCHANT_ID,
+  process.env.VISA_ACCEPTANCE_API_KEY_ID,
+  process.env.VISA_ACCEPTANCE_SECRET_KEY,
+  'SANDBOX',
+  {
     actions: {
       invoices: {
         create: true,
       },
     },
-  },
-});
-
-const tools = visaAcceptanceAgentToolkit.getTools();
+  }
+);
 
 const result = await generateText({
   model: openai('gpt-4o'),
-  tools,
+  tools: visaAcceptanceAgentToolkit.getTools(),
   prompt: `Create an invoice for $199.99 for John Doe (john.doe@example.com)
           with description "Premium Subscription" that should be sent immediately via email`,
 });
 
-console.log('Invoice creation result:', result);
-
+console.log(JSON.stringify(result, null, 2));
 ```
 
-## Model Context Protocol
+## Model Context Protocol Usage
 
-The Visa Acceptance Agent Toolkit also supports the [Model Context Protocol (MCP)](https://modelcontextprotocol.com/). See `/examples/modelcontextprotocol` for an example. The same configuration options are available, and the server can be run with all supported transports.
+The Visa Acceptance Agent Toolkit also supports the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/). See the [`modelcontextprotocol/`](https://github.com/visaacceptance/agent-toolkit/blob/main/modelcontextprotocol/README.md) directory for the MCP server implementation. The same configuration options are available, and the server can be run with all supported transports.
 
 ```typescript
 import {VisaAcceptanceAgentToolkit} from '@visaacceptance/agent-toolkit/modelcontextprotocol';
 import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
 
 const server = new VisaAcceptanceAgentToolkit({
-  merchantId: process.env.MERCHANT_ID,
-  apiKeyId: process.env.API_KEY_ID,
-  secretKey: process.env.SECRET_KEY,
+  merchantId: process.env.VISA_ACCEPTANCE_MERCHANT_ID,
+  apiKeyId: process.env.VISA_ACCEPTANCE_API_KEY_ID,
+  secretKey: process.env.VISA_ACCEPTANCE_SECRET_KEY,
+  environment: process.env.VISA_ACCEPTANCE_ENVIRONMENT,
   configuration: {
     actions: {
       invoices: {
         create: true,
+        read: true,
         update: true,
-        list: true,
-        get: true,
       },
     },
   },

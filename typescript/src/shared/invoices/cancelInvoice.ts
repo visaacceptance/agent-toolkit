@@ -11,7 +11,7 @@ import { z } from 'zod';
 import { Tool } from '../tools';
 import { VisaContext } from '../types';
 import { Context } from '../configuration';
-import { maskInvoiceCustomerInfo } from '../utils/util';
+import { maskInvoiceCustomerInfo } from '../utils/masking';
 const cybersourceRestApi = require('cybersource-rest-client');
 export const cancelInvoiceParameters = (
   context: VisaContext = {} as VisaContext

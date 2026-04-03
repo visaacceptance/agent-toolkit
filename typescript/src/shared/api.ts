@@ -15,6 +15,8 @@ const cybersourceRestApi = require('cybersource-rest-client');
 // TypeScript declaration for Node.js require function
 declare function require(id: string): any;
 
+const TOOLKIT_HEADER = 'visa-acceptance-agent-toolkit-typescript';
+const MCP_HEADER = 'visa-acceptance-mcp';
 
 /**
  * API Client for Visa Acceptance API
@@ -59,7 +61,8 @@ class VisaAcceptanceAPI {
       useMetaKey: config.useMetaKey,
       portfolioID: config.portfolioID,
       pemFileDirectory: config.pemFileDirectory,
-      defaultDeveloperId: 'A2R8EP3K',
+      defaultDeveloperId: config.defaultDeveloperId,
+      disableSSLVerification: config.disableSSLVerification,
       logConfiguration: config.logConfiguration
     };
 
@@ -89,4 +92,3 @@ class VisaAcceptanceAPI {
 }
 
 export default VisaAcceptanceAPI;
-export { VisaAcceptanceAPI };

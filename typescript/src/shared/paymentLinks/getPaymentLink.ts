@@ -23,7 +23,7 @@ export const getPaymentLinkParameters = (
 };
 
 export const getPaymentLinkPrompt = (context: VisaContext = {} as VisaContext) => `
-This tool will get a specific payment link from Visa Acceptance.
+This tool will get details of a payment link by ID from Visa Acceptance.
 `;
 
 

@@ -11,7 +11,7 @@ import { z } from 'zod';
 import { Tool } from '../tools';
 import { VisaContext } from '../types';
 import { Context } from '../configuration';
-import { maskPII } from '../utils/util';
+import { maskPII } from '../utils/masking';
 const cybersourceRestApi = require('cybersource-rest-client');
 
 /**
@@ -32,7 +32,7 @@ export const updatePaymentLinkParameters = (
     id: z.string().describe('Payment link ID (required)'),
     linkType: z.string().optional().describe('Type of payment link (PURCHASE OR DONATION)'),
     purchaseNumber: z.string().optional().describe('Unique identifier for the purchase'),
-    currency: z.string().optional().describe('Currency code e.g. "USD"'),
+    currency: z.string().describe('Currency code e.g. "USD"'),
     totalAmount: z.string().optional().describe('Total payment amount e.g. "100.00"'),
     requestPhone: z.boolean().optional().describe('Request phone number from customer'),
     requestShipping: z.boolean().optional().describe('Request shipping address from customer'),
@@ -51,7 +51,7 @@ export const updatePaymentLinkParameters = (
 };
 
 export const updatePaymentLinkPrompt = (context: VisaContext = {} as VisaContext) => `
-This tool will update a payment link in Visa Acceptance.
+This tool will update an existing payment link by its ID in Visa Acceptance.
 `;
 
 export const updatePaymentLink = async (
