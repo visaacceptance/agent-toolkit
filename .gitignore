@@ -6,9 +6,13 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
+typescript/log
 .env
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Mac Specific files
+.DS_Store
 
 # Runtime data
 pids
@@ -127,6 +131,7 @@ dist
 
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
+.vscode
 
 # yarn v2
 .yarn/cache
@@ -187,5 +192,5 @@ venv.bak/
 modelcontextprotocol/package-lock.json
 typescript/package-lock.json
 typescript/examples/ai-sdk/package-lock.json
-
-*.tsbuildinfo
+typescript/src/test/integration/.env.test
+typescript/log/*

@@ -8,13 +8,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
  */
 
 import type { Tool } from 'ai';
-import { VisaAcceptanceAPI } from '../shared/api';
+import VisaAcceptanceAPI from '../shared/api';
 import { VisaContext } from '../shared/types';
 import VisaAcceptanceTool from './tool';
 import { z } from 'zod';
 import {isToolAllowed} from '../shared/configuration';
 import {Configuration} from '../shared/types';
-import { tools } from '../shared/tools';
+import tools from '../shared/tools';
 
 class VisaAcceptanceAgentToolkit {
   private api: VisaAcceptanceAPI;
@@ -30,7 +30,7 @@ class VisaAcceptanceAgentToolkit {
 
   /**
    * Creates a new Visa Acceptance Agent Toolkit
-   * @param options Configuration options 
+   * @param options Configuration options
    */
   constructor( merchantIdTool: string | undefined, merchantKeyIdTool : string | undefined, secretKeyTool: string | undefined, environment?: string, configuration: Configuration = {}) {
     this.credentials = {
@@ -53,14 +53,16 @@ class VisaAcceptanceAgentToolkit {
     // Set configuration with defaults
     this.configuration = configuration;
     
+    // Log all available tools before filtering
     const allTools = tools(visaContext);
 
-    const filteredTools = allTools.filter((tool: any) => {
+    // Log each tool filtering decision
+    const filteredTools = allTools.filter((tool) => {
       const allowed = isToolAllowed(tool, configuration);
       return allowed;
     });
     
-    filteredTools.forEach((tool: any) => {
+    filteredTools.forEach((tool) => {
       this.tools[tool.method] = VisaAcceptanceTool(this.api, tool.method, tool.description, tool.parameters);
     });
   }

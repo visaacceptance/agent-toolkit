@@ -9,14 +9,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
  */
 
 
-const { StdioServerTransport } = require('@modelcontextprotocol/sdk/server/stdio.js');
-const dotenv = require('dotenv');
-const colors = require('colors');
-const { green, yellow, red } = colors;
-// Import from the typescript package dependency
-const { default: VisaAcceptanceAgentToolkit } = require('@visaacceptance/agent-toolkit/modelcontextprotocol');
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import dotenv from 'dotenv';
+import { green, yellow, red } from 'colors';
+import { VisaAcceptanceAgentToolkit } from '@visaacceptance/agent-toolkit/modelcontextprotocol';
 
 dotenv.config();
+
 /**
  * Main configuration type for the Visa Acceptance MCP server
  */
@@ -39,7 +38,6 @@ const ACCEPTED_TOOLS = [
   'paymentLinks.create',
   'paymentLinks.read',
   'paymentLinks.update',
-
 ];
 
 type Options = {
@@ -110,7 +108,7 @@ export async function main(): Promise<void> {
     };
 
     if (!selectedTools) {
-      throw new Error('No tools specified. Please provide tools via --tools argument or ACCEPTANCE_TOOLS/VISA_ACCEPTANCE_TOOLS environment variable.');
+      throw new Error('No tools specified. Please provide tools via --tools argument or VISA_ACCEPTANCE_TOOLS environment variable.');
     }
 
     if (selectedTools.includes('all')) {
@@ -165,10 +163,8 @@ export async function main(): Promise<void> {
   }
 }
 
-
 if (require.main === module) {
   main().catch((error) => {
     handleError(error);
   });
 }
-

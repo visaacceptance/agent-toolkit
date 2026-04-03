@@ -1,8 +1,12 @@
 # Visa Acceptance Model Context Protocol
 
-The Visa Acceptance [Model Context Protocol](https://modelcontextprotocol.com/) server allows you to integrate with Visa Acceptance APIs through function calling. This protocol supports various tools to interact with different Visa Acceptance services, including enhanced invoice management, and payment links functionality.
+The Visa Acceptance [Model Context Protocol](https://modelcontextprotocol.io/) server allows you to integrate with Visa Acceptance APIs through function calling. This protocol supports various tools to interact with different Visa Acceptance services, including enhanced invoice management, and payment links functionality.
 
-## Quick Start
+## Local Development
+
+This package depends on `@visaacceptance/agent-toolkit`. For local development setup and package linking instructions, see the [Local Development](https://github.com/visaacceptance/agent-toolkit/blob/main/README.md#local-development) section in the root README.
+
+## Usage
 
 To run the Visa Acceptance MCP server using npx, use the following command:
 
@@ -10,16 +14,16 @@ To run the Visa Acceptance MCP server using npx, use the following command:
 # To set up all available tools
 npx -y @visaacceptance/mcp --tools=all --merchant-id=YOUR_MERCHANT_ID --api-key-id=YOUR_API_KEY_ID --secret-key=YOUR_SECRET_KEY
 
-# To set up specific tools 
+# To set up specific tool actions
 npx -y @visaacceptance/mcp --tools=invoices.create,invoices.read,paymentLinks.create,paymentLinks.read --merchant-id=YOUR_MERCHANT_ID --api-key-id=YOUR_API_KEY_ID --secret-key=YOUR_SECRET_KEY
 
-# To configure test environment (default is true)
-npx -y @visaacceptance/mcp --tools=all --merchant-id=YOUR_MERCHANT_ID --api-key-id=YOUR_API_KEY_ID --secret-key=YOUR_SECRET_KEY --use-test-env=true
+# To configure test environment (default is SANDBOX)
+npx -y @visaacceptance/mcp --tools=all --merchant-id=YOUR_MERCHANT_ID --api-key-id=YOUR_API_KEY_ID --secret-key=YOUR_SECRET_KEY --environment=SANDBOX
 ```
 
 Make sure to replace the credential placeholders with your actual Visa Acceptance credentials. Alternatively, you could set these values in your environment variables.
 
-## Usage with Claude Desktop
+### Usage with Claude Desktop
 
 Add the following to your `claude_desktop_config.json`. See [here](https://modelcontextprotocol.io/quickstart/user) for more details.
 
@@ -41,25 +45,24 @@ Add the following to your `claude_desktop_config.json`. See [here](https://model
 }
 ```
 
+## Available Tool Permissions
+You can also supply any list of these tool permissions for the `tools` parameter above, based on the operation(s)
+associated with each permission.
 
-## Available Tools
-
-| Tool                    | Description                                                                |
+| Tool Permission         | Associated Tools                                                           |
 | ----------------------- | -------------------------------------------------------------------------- |
-| `invoices.create`       | Create a new invoice with customer info and enhanced invoice parameters    |
-| `invoices.update`       | Update an existing invoice including customer and invoice information      |
-| `invoices.list`         | List invoices with pagination support                                      |
-| `invoices.get`          | Get detailed invoice transaction                                               |
-| `paymentLinks.create`   | Create a new payment link with optional shipping info                      |
-| `paymentLinks.update`   | Update an existing payment link                                            |
-| `paymentLinks.list`     | List payment links with pagination                                         |
-| `paymentLinks.get`      | Retrieve details of a specific payment link                                |
+| `invoices.create`       | `create_invoice`                                                           |
+| `invoices.read`         | `get_invoice`, `list_invoices`                                             |
+| `invoices.update`       | `update_invoice`, `send_invoice`, `cancel_invoice`                         |
+| `paymentLinks.create`   | `create_payment_link`                                                      |
+| `paymentLinks.read`     | `get_payment_link`, `list_payment_links`                                   |
+| `paymentLinks.update`   | `update_payment_link`                                                      |
 
 ## Debugging the Server
 
 To debug your server, you can use the [MCP Inspector](https://modelcontextprotocol.io/docs/tools/inspector).
 
-First build the server:
+First build the server
 
 ```bash
 npm run build
@@ -72,9 +75,7 @@ Run the following command in your terminal:
 npx @modelcontextprotocol/inspector node dist/index.js --tools=all --merchant-id=YOUR_MERCHANT_ID --api-key-id=YOUR_API_KEY_ID --secret-key=YOUR_SECRET_KEY
 ```
 
-
-
-### Debugging Instructions
+### Instructions
 
 1. Replace the credential placeholders with your actual Visa Acceptance credentials.
 2. Run the command to start the MCP Inspector.
@@ -85,78 +86,23 @@ npx @modelcontextprotocol/inspector node dist/index.js --tools=all --merchant-id
 
 You can also configure the server using environment variables:
 
-```bash
+```
 # Visa Acceptance API Credentials
-# Both new simplified names and old names are supported
-# New simplified names take precedence if both are defined
-
-VISA_ACCEPTANCE_MERCHANT_ID=your_merchant_id
-VISA_ACCEPTANCE_API_KEY_ID=your_api_key_id
-VISA_ACCEPTANCE_SECRET_KEY=your_secret_key
+# Both simplified names and verbose names are supported
+# Simplified names take precedence if both are defined
+MERCHANT_ID=your_merchant_id
+API_KEY_ID=your_api_key_id
+SECRET_KEY=your_secret_key
+# Verbose format (also supported)
+# VISA_ACCEPTANCE_MERCHANT_ID=your_merchant_id
+# VISA_ACCEPTANCE_API_KEY_ID=your_api_key_id
+# VISA_ACCEPTANCE_SECRET_KEY=your_secret_key
 
 # Environment Configuration
-# When true, points to apitest.visa-acceptance.com (non-production)
-# When false, points to api.visa-acceptance.com (production)
+# When SANDBOX, points to non-production endpoint
+# When PRODUCTION, points to production endpoint
 VISA_ACCEPTANCE_ENVIRONMENT=SANDBOX
+
+# Tools Configuration
 VISA_ACCEPTANCE_TOOLS=all
-
 ```
-
-You can copy the `.env.template` file to get started:
-
-```bash
-cp .env.template .env
-```
-
-## Local Development
-
-This package is designed to be used as a local npm package during development. Follow these steps to set up the package for local development:
-
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/visaacceptance/agent-toolkit.git
-   cd agent-toolkit/modelcontextprotocol
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Build the package:
-   ```bash
-   npm run build
-   ```
-
-### Local Package Linking
-
-To use this package locally in another project:
-
-1. Link the package globally:
-   ```bash
-   npm link
-   ```
-
-2. In your project directory, link to the package:
-   ```bash
-   npm link @visaacceptance/mcp
-   ```
-
-3. You can now import and use the package in your project:
-   ```javascript
-   import { VisaAcceptanceAgentToolkit } from '@visaacceptance/mcp';
-   // or
-   const { VisaAcceptanceAgentToolkit } = require('@visaacceptance/mcp');
-   ```
-
-### Development Workflow
-
-1. Make changes to the source code
-2. Rebuild the package:
-   ```bash
-   npm run build
-   ```
-3. The linked projects will automatically use the updated version
-

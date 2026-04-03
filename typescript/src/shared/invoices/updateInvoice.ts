@@ -11,7 +11,7 @@ import { z } from 'zod';
 import { Tool } from '../tools';
 import { VisaContext } from '../types';
 import { Context } from '../configuration';
-import { maskInvoiceCustomerInfo } from '../utils/util';
+import { maskInvoiceCustomerInfo } from '../utils/masking';
 const cybersourceRestApi = require('cybersource-rest-client');
 
 export const updateInvoicePrompt = (context: VisaContext = {} as VisaContext) => `
@@ -70,8 +70,8 @@ export const updateInvoiceParameters = (
       name: z.string().optional().describe('Customer name (optional)')
     }).describe('Customer information object (required even if properties are optional)'),
     invoiceInformation: z.object({
-      description: z.string().optional().describe('Invoice description (required)'),
-      dueDate: z.string().optional().describe('Due date (required)'),
+      description: z.string().describe('Invoice description (required)'),
+      dueDate: z.string().describe('Due date (required)'),
       allowPartialPayments: z.boolean().optional().describe('Whether to allow partial payments (optional)'),
       deliveryMode: z.string().optional().describe('Delivery mode (optional)')
     }).describe('Invoice information object (required even if properties are optional)'),

@@ -84,7 +84,6 @@ export const maskInvoiceCustomerInfo = (
   }
 };
 
-
 /**
  * Masks customer information in an array of invoice objects
  */

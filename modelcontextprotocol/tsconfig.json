@@ -3,20 +3,32 @@
     "target": "ES2022",
     "module": "Node16",
     "moduleResolution": "Node16",
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "strict": true,
     "esModuleInterop": true,
+    "strict": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "declaration": true,
+    "outDir": "./dist",
+    "rootDir": "./",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "lib": ["ES2020", "DOM"],
+    "types": ["node"],
+    "baseUrl": ".",
+    "composite": true,
+    "typeRoots": ["./node_modules/@types", "./types"],
+    "paths": {
+      "../typescript/src/shared/*": ["../typescript/src/shared/*"]
+    },
+    "sourceMap": true
   },
   "include": [
-    "src/**/*",
+    "*.ts",
     "src/**/*.ts",
     "types/**/*.d.ts"
   ],
   "references": [
-
+    { "path": "../typescript" }
   ],
   "exclude": [
     "node_modules",

@@ -11,10 +11,8 @@ import { z } from 'zod';
 import { Tool } from '../tools';
 import { VisaContext } from '../types';
 import { Context } from '../configuration';
-import { maskInvoiceCustomerInfo } from '../utils/util';
+import { maskInvoiceCustomerInfo } from '../utils/masking';
 const cybersourceRestApi = require('cybersource-rest-client');
-
-
 
 export const createInvoiceParameters = (
   context: VisaContext = {} as VisaContext
@@ -30,7 +28,7 @@ export const createInvoiceParameters = (
       dueDate: z.string().describe('Due date in YYYY-MM-DD format'),
       sendImmediately: z.boolean().describe('Whether to send the invoice immediately'),
       deliveryMode: z.string().describe('Delivery mode e.g. "email"')
-    }).required().describe('Invoice information object'),
+    }).describe('Invoice information object'),
   });
 };
 

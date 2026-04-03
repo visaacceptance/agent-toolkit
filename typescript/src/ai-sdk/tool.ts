@@ -7,21 +7,19 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import type {CoreTool} from 'ai';
 import {tool} from 'ai';
 import {z} from 'zod';
 import VisaAcceptanceAPI from '../shared/api';
-
 
 export default function VisaAcceptanceTool(
     visaAcceptanceAPI: VisaAcceptanceAPI,
     method: string,
     description: string,
     schema: z.ZodObject<any, any, any, any, {[x: string]: any}>
-  ): CoreTool {
+  ) {
     return tool({
       description: description,
-      parameters: schema,
+      inputSchema: schema,
       execute: async (arg: z.output<typeof schema>) => {
         // Use type assertion to ensure TypeScript recognizes the run method
         return (visaAcceptanceAPI as any).run(method, arg);
